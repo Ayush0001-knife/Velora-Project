@@ -1,187 +1,183 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { FiSearch } from "react-icons/fi";
 
 const PatientList = () => {
   const navigate = useNavigate();
 
-  const handleClick = (item) => {
-    navigate("/patient");
-  };
-
-  let data = [
+  const data = [
     {
-      name: "Ayush",
-      sex: "Male",
-      age: 20,
-      bmi: 20,
-      reportGenerated: false,
-    },
-    {
-      name: "Rahul",
+      name: "Ayush Kumar",
       sex: "Male",
       age: 25,
-      bmi: 22,
+      bmi: 20.5,
       reportGenerated: true,
     },
     {
-      name: "Sneha",
+      name: "Priya Sharma",
       sex: "Female",
-      age: 22,
-      bmi: 19,
+      age: 32,
+      bmi: 22.1,
       reportGenerated: false,
     },
     {
-      name: "Anjali",
-      sex: "Female",
-      age: 23,
-      bmi: 21,
+      name: "Rahul Verma",
+      sex: "Male",
+      age: 45,
+      bmi: 26.8,
       reportGenerated: true,
     },
     {
-      name: "Vikas",
-      sex: "Male",
+      name: "Anjali Patel",
+      sex: "Female",
       age: 28,
-      bmi: 24,
+      bmi: 19.2,
       reportGenerated: false,
     },
     {
-      name: "Ravi",
+      name: "Vikram Singh",
       sex: "Male",
-      age: 31,
-      bmi: 26,
+      age: 39,
+      bmi: 24.5,
       reportGenerated: true,
     },
     {
-      name: "Priya",
+      name: "Neha Gupta",
       sex: "Female",
-      age: 29,
-      bmi: 23,
+      age: 31,
+      bmi: 21.7,
+      reportGenerated: true,
+    },
+    {
+      name: "Ravi Mishra",
+      sex: "Male",
+      age: 27,
+      bmi: 23.0,
       reportGenerated: false,
     },
     {
-      name: "Riya",
+      name: "Sneha Joshi",
       sex: "Female",
-      age: 26,
-      bmi: 20,
+      age: 24,
+      bmi: 20.8,
       reportGenerated: true,
+    },
+    {
+      name: "Arun Desai",
+      sex: "Male",
+      age: 41,
+      bmi: 25.3,
+      reportGenerated: false,
     },
   ];
 
   const [list, setList] = useState(data);
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const handleNameSort = () => {
-    const sortedData = data.sort((a, b) => a.name.localeCompare(b.name));
-    setList(sortedData);
+  const handleClick = (patient) => {
+    navigate("/patient", { state: { patient } });
   };
 
-  const handleSexSort = () => {
-    const sortedData = data.sort((a, b) => a.sex.localeCompare(b.sex));
-    setList(sortedData);
-  };
-
-  const handleAgeSort = () => {
-    const sortedData = data.sort((a, b) => a.age - b.age);
-    setList(sortedData);
-  };
-
-  const handleBMISort = () => {
-    const sortedData = data.sort((a, b) => a.bmi - b.bmi);
-    setList(sortedData);
-  };
-
-  const handleReportStatusSort = () => {
-    const sortedData = data.sort((a, b) => {
-      if (a.reportGenerated && !b.reportGenerated) {
-        return -1;
-      } else if (!a.reportGenerated && b.reportGenerated) {
-        return 1;
-      } else {
-        return 0;
-      }
+  const handleSort = (key) => {
+    const sorted = [...list].sort((a, b) => {
+      if (key === "reportGenerated") return b[key] - a[key];
+      if (typeof a[key] === "string") return a[key].localeCompare(b[key]);
+      return a[key] - b[key];
     });
-    setList(sortedData);
+    setList(sorted);
   };
+
+  const filteredList = list.filter((patient) =>
+    patient.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
-    <div className="p-6 h-screen">
-      <div className="bg-white rounded-xl shadow-xl overflow-hidden flex flex-col mt-5 border border-gray-200">
-        {/* Header */}
-        <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white py-5 px-6 sticky top-0 z-10 rounded-t-xl">
-          <div className="grid grid-cols-6 gap-4 font-semibold items-center">
-            <div
-              className="text-center cursor-pointer hover:text-gray-300 transition-colors duration-200"
-              onClick={() => handleNameSort()}
-            >
-              Name
-            </div>
-            <div
-              className="text-center cursor-pointer hover:text-gray-300 transition-colors duration-200"
-              onClick={() => handleSexSort()}
-            >
-              Sex
-            </div>
-            <div
-              className="text-center cursor-pointer hover:text-gray-300 transition-colors duration-200"
-              onClick={() => handleAgeSort()}
-            >
-              Age
-            </div>
-            <div
-              className="text-center cursor-pointer hover:text-gray-300 transition-colors duration-200"
-              onClick={() => handleBMISort()}
-            >
-              BMI
-            </div>
-            <div
-              className="text-center cursor-pointer hover:text-gray-300 transition-colors duration-200"
-              onClick={() => handleReportStatusSort()}
-            >
-              Report Status
-            </div>
-            <div className="flex items-center gap-3">
-              <input
-                type="text"
-                placeholder="Search"
-                className="w-[50%] p-2 border border-gray-100 bg-white rounded-md text-sm text-gray-800 focus:outline-none"
-              />
-              <i className="ri-search-eye-line text-4xl text-orange-500"></i>
+    <div className="w-[95%] h-[95vh] mx-auto my-[2.5vh] bg-white rounded-2xl shadow-lg flex flex-col ">
+      {/* Header */}
+      <div className="bg-blue-500 text-white p-6 flex-shrink-0 rounded-t-2xl">
+        <h1 className="text-2xl font-bold mb-4">Patient Records</h1>
+        <div className="flex items-center justify-between w-full">
+          <div className="flex items-center">
+            <input
+              type="text"
+              placeholder="Search patients..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="bg-white text-gray-800 rounded-lg px-4 py-2 w-64 focus:outline-none focus:ring-2 focus:ring-blue-300 transition-all"
+            />
+            <FiSearch className="ml-2 text-xl" />
+          </div>
+          <button
+            type="button"
+            className="btn btn-light h-[4rem] w-[13rem] "
+            onClick={() => navigate("/add-patient")}
+          >
+            <span className="text-lg font-semibold text-blue-600">
+              Add Patient +
+            </span>
+          </button>
+        </div>
+      </div>
+
+      {/* Table Header */}
+      <div className="bg-gray-200 flex px-6 py-4 sticky top-0 z-10 border-b border-gray-200">
+        <div
+          onClick={() => handleSort("name")}
+          className="w-[20%] px-4 font-semibold text-gray-700 cursor-pointer hover:text-blue-500"
+        >
+          Patient Name
+        </div>
+        <div
+          onClick={() => handleSort("sex")}
+          className="w-[15%] px-4 text-center font-semibold text-gray-700 cursor-pointer hover:text-blue-500"
+        >
+          Gender
+        </div>
+        <div
+          onClick={() => handleSort("age")}
+          className="w-[15%] px-4 text-center font-semibold text-gray-700 cursor-pointer hover:text-blue-500"
+        >
+          Age
+        </div>
+        <div
+          onClick={() => handleSort("bmi")}
+          className="w-[15%] px-4 text-center font-semibold text-gray-700 cursor-pointer hover:text-blue-500"
+        >
+          BMI
+        </div>
+        <div
+          onClick={() => handleSort("reportGenerated")}
+          className="w-[20%] px-4 text-center font-semibold text-gray-700 cursor-pointer hover:text-blue-500"
+        >
+          Status
+        </div>
+      </div>
+
+      {/* Patient Rows */}
+      <div className="flex-grow overflow-y-auto px-6">
+        {filteredList.map((item, index) => (
+          <div
+            key={index}
+            onClick={() => handleClick(item)}
+            className="flex py-4 border-b border-gray-200 hover:bg-gray-50 cursor-pointer"
+          >
+            <div className="w-[20%] px-4 font-medium">{item.name}</div>
+            <div className="w-[15%] px-4 text-center">{item.sex}</div>
+            <div className="w-[15%] px-4 text-center">{item.age}</div>
+            <div className="w-[15%] px-4 text-center">{item.bmi}</div>
+            <div className="w-[20%] px-4 text-center">
+              <span
+                className={`inline-block px-3 py-1 rounded-full text-xs font-semibold uppercase ${
+                  item.reportGenerated
+                    ? "bg-green-100 text-green-800"
+                    : "bg-yellow-100 text-yellow-800"
+                }`}
+              >
+                {item.reportGenerated ? "Complete" : "Pending"}
+              </span>
             </div>
           </div>
-        </div>
-
-        {/* Scrollable patient list */}
-        <div
-          className="divide-y divide-gray-200 overflow-y-auto max-h-[28rem] px-6"
-          onClick={() => handleClick()}
-        >
-          {list.map((item, index) => (
-            <div
-              className="hover:bg-gray-50 transition duration-200 ease-in-out"
-              key={`${item.name}-${index}`}
-            >
-              <div className="grid grid-cols-6 gap-4 py-4 text-sm items-center">
-                <div className="text-center font-medium text-gray-900">
-                  {item.name}
-                </div>
-                <div className="text-center text-gray-700">{item.sex}</div>
-                <div className="text-center text-gray-700">{item.age}</div>
-                <div className="text-center text-gray-700">{item.bmi}</div>
-                <div className="text-center">
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                      item.reportGenerated
-                        ? "bg-green-100 text-green-800"
-                        : "bg-yellow-100 text-yellow-800"
-                    }`}
-                  >
-                    {item.reportGenerated ? "Generated" : "Pending"}
-                  </span>
-                </div>
-                <div></div>
-              </div>
-            </div>
-          ))}
-        </div>
+        ))}
       </div>
     </div>
   );

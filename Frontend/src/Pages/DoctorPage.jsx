@@ -5,7 +5,7 @@ import PatientFXN from "../Components-1/PatientFXN";
 const DoctorPage = () => {
   return (
     <>
-      <div className="bg-[#b5aef3] h-screen w-screen border-1 ">
+      <div className="h-screen">
         <DoctorNavbar />
         <PatientFXN />
       </div>

@@ -3,17 +3,17 @@ import DoctorPage from "./Pages/DoctorPage";
 import { Routes, Route } from "react-router-dom";
 import AddPatient from "./Components-1/AddPatient";
 import PatientPage from "./Components-1/PatientPage";
-import PatientInterface from "./Pages/PatientInterface";
+import LoginPage from "./Components-1/LoginPage";
 
 const App = () => {
   return (
     <>
-      {/* <Routes>
+      <Routes>
         <Route path="/" element={<DoctorPage />} />
         <Route path="/add-patient" element={<AddPatient />} />
         <Route path="/patient" element={<PatientPage />} />
-      </Routes> */}
-      <PatientInterface />
+      </Routes>
+      {/* <PatientInterface /> */}
     </>
   );
 };

@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 const DoctorNavbar = () => {
-  const [activePillar, setActivePillar] = useState("patient");
+  const [activePillar, setActivePillar] = useState("patients");
 
   const handlePillarChange = (e) => {
     setActivePillar(e);

@@ -34,7 +34,7 @@ const PatientPage = () => {
       type: "Uploaded",
     },
     {
-      name: "ECG Report",
+      name: "Cardiography",
       date: "2024-03-10",
       score: 88,
       type: "Uploaded",
@@ -65,10 +65,10 @@ const PatientPage = () => {
       {/* Left Sidebar */}
       <div className="col-start-1 col-end-2 row-start-1 row-end-6 p-3 flex items-center flex-col relative">
         {/* Profile Photo */}
-        <div className="h-[25%] w-[80%] rounded-full shadow-lg shadow-gray-500">
+        <div className="h-[25%] w-[80%] rounded-[2rem] shadow-lg shadow-gray-500">
           <img
             src="https://images.rawpixel.com/image_800/czNmcy1wcml2YXRlL3Jhd3BpeGVsX2ltYWdlcy93ZWJzaXRlX2NvbnRlbnQvbHIvczc3LW1ja2luc2V5LTc2MTEtcG9tXzMuanBn.jpg"
-            className="h-full w-full rounded-full object-cover"
+            className="h-full w-full rounded-[2rem] object-cover"
             alt="Profile"
           />
         </div>
@@ -87,7 +87,7 @@ const PatientPage = () => {
         {/* Details Card + Overlay */}
         <div className="w-[90%] mt-5 relative flex justify-center items-start">
           {/* Main Info Card */}
-          <div className="flex flex-col w-full gap-3 bg-white border border-gray-600 shadow-md shadow-gray-400 rounded-lg p-4 z-0">
+          <div className="flex flex-col w-full gap-3 bg-white border border-gray-600 shadow-md shadow-gray-400 rounded-[1rem] p-4 z-0">
             <div className="grid grid-cols-2 gap-4">
               {[
                 ["Age", "32"],
@@ -140,7 +140,7 @@ const PatientPage = () => {
           {/* Sliding Overlay Panel */}
           <div
             ref={moreDetailsRef}
-            className="absolute inset-0 z-10 bg-white rounded-lg overflow-y-auto shadow-md shadow-gray-400"
+            className="absolute inset-0 z-10 bg-white rounded-[1rem] overflow-y-auto shadow-md shadow-gray-400"
             style={{ opacity: 0, transform: "translateY(100%)" }}
           >
             <MoreDetails setMoreDetails={setMoreDetails} />
@@ -149,7 +149,7 @@ const PatientPage = () => {
       </div>
 
       {/* Documents List */}
-      <div className="col-start-2 col-end-6 row-start-4 row-end-6 bg-white border-2 border-gray-200 rounded-lg shadow-xl m-2 overflow-hidden">
+      <div className="col-start-2 col-end-6 row-start-4 row-end-6 bg-white border-2 border-gray-200 rounded-[1rem] shadow-xl m-2 overflow-hidden">
         <h2 className="text-xl font-semibold p-3 border-b border-gray-200">
           Processed Documents
         </h2>
@@ -158,10 +158,10 @@ const PatientPage = () => {
             {documents.map((doc, index) => (
               <div
                 key={index}
-                className="flex items-center justify-between bg-gray-50 p-2 rounded-lg shadow hover:shadow-md transition-shadow border border-gray-100"
+                className="flex items-center justify-between bg-gray-50 p-2 rounded-[1rem] shadow hover:shadow-md transition-shadow border border-gray-100"
               >
                 <div className="flex items-center gap-4">
-                  <div className="p-2 bg-blue-100 rounded-full">
+                  <div className="p-2 bg-blue-100 rounded-[1rem]">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       className="h-5 w-5 text-blue-600"
@@ -191,7 +191,7 @@ const PatientPage = () => {
                     </span>
                     <span className="text-xs text-gray-500">Score</span>
                   </div>
-                  <button className="p-1.5 hover:bg-gray-100 rounded-full">
+                  <button className="p-1.5 hover:bg-gray-100 rounded-[1rem]">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       className="h-4 w-4 text-gray-600"
@@ -208,62 +208,62 @@ const PatientPage = () => {
         </div>
       </div>
 
-      <div className="col-start-2 col-end-4 row-start-1 row-end-4 bg-white p-4 border-2 border-gray-200 rounded-lg shadow-xl m-2 mt-5">
+      <div className="col-start-2 col-end-4 row-start-1 row-end-4 bg-white p-4 border-2 border-gray-200 rounded-[1rem] shadow-xl m-2 mt-5">
         <h2 className="text-xl font-semibold mb-4">Health Pillars Score</h2>
         <div className="grid grid-cols-2 gap-6">
           {/* Nutrition Score */}
-          <div className="bg-green-50 p-4 rounded-lg">
+          <div className="bg-green-50 p-4 rounded-[1rem]">
             <div className="flex justify-between items-center mb-2">
               <span className="font-medium text-green-700">
                 Nutrition Score
               </span>
               <span className="text-2xl font-bold text-green-600">85</span>
             </div>
-            <div className="w-full bg-green-200 rounded-full h-2">
+            <div className="w-full bg-green-200 rounded-[1rem] h-2">
               <div
-                className="bg-green-600 h-2 rounded-full"
+                className="bg-green-600 h-2 rounded-[1rem]"
                 style={{ width: "85%" }}
               ></div>
             </div>
           </div>
 
           {/* Exercise Score */}
-          <div className="bg-blue-50 p-4 rounded-lg">
+          <div className="bg-blue-50 p-4 rounded-[1rem]">
             <div className="flex justify-between items-center mb-2">
               <span className="font-medium text-blue-700">Exercise Score</span>
               <span className="text-2xl font-bold text-blue-600">78</span>
             </div>
-            <div className="w-full bg-blue-200 rounded-full h-2">
+            <div className="w-full bg-blue-200 rounded-[1rem] h-2">
               <div
-                className="bg-blue-600 h-2 rounded-full"
+                className="bg-blue-600 h-2 rounded-[1rem]"
                 style={{ width: "78%" }}
               ></div>
             </div>
           </div>
 
           {/* Mental Health Score */}
-          <div className="bg-purple-50 p-4 rounded-lg">
+          <div className="bg-purple-50 p-4 rounded-[1rem]">
             <div className="flex justify-between items-center mb-2">
               <span className="font-medium text-purple-700">Mental Health</span>
               <span className="text-2xl font-bold text-purple-600">92</span>
             </div>
-            <div className="w-full bg-purple-200 rounded-full h-2">
+            <div className="w-full bg-purple-200 rounded-[1rem] h-2">
               <div
-                className="bg-purple-600 h-2 rounded-full"
+                className="bg-purple-600 h-2 rounded-[1rem]"
                 style={{ width: "92%" }}
               ></div>
             </div>
           </div>
 
           {/* Sleep Quality Score */}
-          <div className="bg-indigo-50 p-4 rounded-lg">
+          <div className="bg-indigo-50 p-4 rounded-[1rem]">
             <div className="flex justify-between items-center mb-2">
               <span className="font-medium text-indigo-700">Sleep Quality</span>
               <span className="text-2xl font-bold text-indigo-600">88</span>
             </div>
-            <div className="w-full bg-indigo-200 rounded-full h-2">
+            <div className="w-full bg-indigo-200 rounded-[1rem] h-2">
               <div
-                className="bg-indigo-600 h-2 rounded-full"
+                className="bg-indigo-600 h-2 rounded-[1rem]"
                 style={{ width: "88%" }}
               ></div>
             </div>
@@ -276,7 +276,7 @@ const PatientPage = () => {
             Prevention Alerts
           </h3>
           <div className="space-y-2">
-            <div className="flex items-center gap-2 bg-yellow-50 p-3 rounded-lg border border-yellow-200">
+            <div className="flex items-center gap-2 bg-yellow-50 p-3 rounded-[1rem] border border-yellow-200">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-5 w-5 text-yellow-600"
@@ -293,7 +293,7 @@ const PatientPage = () => {
                 Due for annual health checkup
               </span>
             </div>
-            <div className="flex items-center gap-2 bg-red-50 p-3 rounded-lg border border-red-200">
+            <div className="flex items-center gap-2 bg-red-50 p-3 rounded-[1rem] border border-red-200">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-5 w-5 text-red-600"
@@ -314,11 +314,11 @@ const PatientPage = () => {
         </div>
       </div>
 
-      <div className="col-start-4 col-end-6 row-start-1 row-end-3 bg-white p-4 border-2 border-gray-200 rounded-lg shadow-xl m-2 mt-5">
+      <div className="col-start-4 col-end-6 row-start-1 row-end-4 bg-white p-4 border-2 border-gray-200 rounded-[1rem] shadow-xl m-2 mt-5">
         <h2 className="text-xl font-semibold mb-4">Patient Actions</h2>
         <div className="grid grid-cols-2 gap-4">
           {/* Update Patient Values Button */}
-          <button className="flex items-center justify-center gap-2 p-4 bg-blue-100 rounded-lg hover:bg-blue-200 transition-colors">
+          <button className="flex items-center justify-center gap-2 p-4 bg-blue-100 rounded-[1rem] hover:bg-blue-200 transition-colors">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-6 w-6 text-blue-600"
@@ -337,7 +337,7 @@ const PatientPage = () => {
           </button>
 
           {/* Upload New Document Button */}
-          <button className="flex items-center justify-center gap-2 p-4 bg-green-100 rounded-lg hover:bg-green-200 transition-colors">
+          <button className="flex items-center justify-center gap-2 p-4 bg-green-100 rounded-[1rem] hover:bg-green-200 transition-colors">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-6 w-6 text-green-600"
@@ -356,7 +356,7 @@ const PatientPage = () => {
           </button>
 
           {/* Generate New Report Button */}
-          <button className="flex items-center justify-center gap-2 p-4 bg-purple-100 rounded-lg hover:bg-purple-200 transition-colors">
+          <button className="flex items-center justify-center gap-2 p-4 bg-purple-100 rounded-[1rem] hover:bg-purple-200 transition-colors">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-6 w-6 text-purple-600"
@@ -375,7 +375,7 @@ const PatientPage = () => {
           </button>
 
           {/* View History Button */}
-          <button className="flex items-center justify-center gap-2 p-4 bg-orange-100 rounded-lg hover:bg-orange-200 transition-colors">
+          <button className="flex items-center justify-center gap-2 p-4 bg-orange-100 rounded-[1rem] hover:bg-orange-200 transition-colors">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-6 w-6 text-orange-600"
@@ -394,7 +394,7 @@ const PatientPage = () => {
           </button>
 
           {/* Send Email Button */}
-          <button className="flex items-center justify-center gap-2 p-4 bg-red-100 rounded-lg hover:bg-red-200 transition-colors">
+          <button className="flex items-center justify-center gap-2 p-4 bg-red-100 rounded-[1rem] hover:bg-red-200 transition-colors">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-6 w-6 text-red-600"
@@ -413,7 +413,7 @@ const PatientPage = () => {
           </button>
 
           {/* Export Data Button */}
-          <button className="flex items-center justify-center gap-2 p-4 bg-teal-100 rounded-lg hover:bg-teal-200 transition-colors">
+          <button className="flex items-center justify-center gap-2 p-4 bg-teal-100 rounded-[1rem] hover:bg-teal-200 transition-colors">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-6 w-6 text-teal-600"
