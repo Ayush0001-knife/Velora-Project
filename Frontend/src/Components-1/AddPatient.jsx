@@ -248,9 +248,6 @@ const ModernAddPatient = () => {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-white rounded-full shadow-lg mb-4">
-            <Plus className="h-8 w-8 text-blue-600" />
-          </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             Add New Patient
           </h1>

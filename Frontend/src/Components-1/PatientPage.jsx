@@ -39,7 +39,6 @@ const PatientPage = () => {
       score: 88,
       type: "Uploaded",
     },
-    // Add more documents as needed
   ]);
 
   useGSAP(() => {
@@ -63,32 +62,32 @@ const PatientPage = () => {
   return (
     <div className="grid grid-cols-5 grid-rows-5 gap-0 w-full h-screen overflow-hidden">
       {/* Left Sidebar */}
-      <div className="col-start-1 col-end-2 row-start-1 row-end-6 p-3 flex items-center flex-col relative">
+      <div className="col-start-1 col-end-2 row-start-1 row-end-6 p-2 flex items-center flex-col relative">
         {/* Profile Photo */}
-        <div className="h-[25%] w-[80%] rounded-[2rem] shadow-lg shadow-gray-500">
+        <div className="h-[30%] w-[85%] rounded-full shadow-md shadow-gray-500 overflow-hidden">
           <img
             src="https://images.rawpixel.com/image_800/czNmcy1wcml2YXRlL3Jhd3BpeGVsX2ltYWdlcy93ZWJzaXRlX2NvbnRlbnQvbHIvczc3LW1ja2luc2V5LTc2MTEtcG9tXzMuanBn.jpg"
-            className="h-full w-full rounded-[2rem] object-cover"
+            className="h-full w-full object-cover"
             alt="Profile"
           />
         </div>
 
         {/* Basic Info */}
-        <div className="h-[5%] w-[90%] flex flex-col items-center mt-3 space-y-2">
-          <span className="text-2xl font-semibold">Diego Carbonell</span>
-          <span className="text-lg text-gray-500 font-medium italic">
+        <div className="w-[90%] flex flex-col items-center my-6 space-y-2">
+          <span className="text-lg font-semibold">Diego Carbonell</span>
+          <span className="text-sm text-gray-500 font-medium italic">
             30/06/2025
           </span>
-          <span className="text-blue-600 underline cursor-pointer hover:text-blue-800">
+          <span className="text-sm text-blue-600 underline cursor-pointer hover:text-blue-800">
             test@gmail.com
           </span>
         </div>
 
         {/* Details Card + Overlay */}
-        <div className="w-[90%] mt-5 relative flex justify-center items-start">
+        <div className="w-[90%] h-[55%] relative flex justify-center items-start">
           {/* Main Info Card */}
-          <div className="flex flex-col w-full gap-3 bg-white border border-gray-600 shadow-md shadow-gray-400 rounded-[1rem] p-4 z-0">
-            <div className="grid grid-cols-2 gap-4">
+          <div className="flex flex-col w-full h-full gap-2 bg-white border border-gray-600 shadow-md shadow-gray-400 rounded-[0.75rem] p-3 z-0">
+            <div className="grid grid-cols-2 gap-3">
               {[
                 ["Age", "32"],
                 ["Sex", "Male"],
@@ -103,8 +102,8 @@ const PatientPage = () => {
                 ["Steps/day", "10000"],
               ].map(([label, value]) => (
                 <div className="flex flex-col" key={label}>
-                  <span className="text-lg font-medium">{label}</span>
-                  <span className="text-gray-500">{value}</span>
+                  <span className="text-sm font-medium">{label}</span>
+                  <span className="text-xs text-gray-500">{value}</span>
                 </div>
               ))}
             </div>
@@ -113,7 +112,7 @@ const PatientPage = () => {
             <div className="flex items-center gap-2 text-blue-600 hover:text-blue-800 cursor-pointer">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
+                className="h-4 w-4"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -125,13 +124,13 @@ const PatientPage = () => {
                   d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                 />
               </svg>
-              <span className="font-medium">See pathology report</span>
+              <span className="text-xs font-medium">See pathology report</span>
             </div>
 
             {/* Toggle more details */}
-            <div className="flex justify-center">
+            <div className="flex justify-center mt-auto">
               <i
-                className="ri-arrow-up-wide-line text-2xl text-gray-600 hover:text-gray-800 cursor-pointer transition-transform hover:translate-y-[-2px]"
+                className="ri-arrow-up-wide-line text-xl text-gray-600 hover:text-gray-800 cursor-pointer transition-transform hover:translate-y-[-2px]"
                 onClick={() => setMoreDetails(!moreDetails)}
               />
             </div>
@@ -140,7 +139,7 @@ const PatientPage = () => {
           {/* Sliding Overlay Panel */}
           <div
             ref={moreDetailsRef}
-            className="absolute inset-0 z-10 bg-white rounded-[1rem] overflow-y-auto shadow-md shadow-gray-400"
+            className="absolute inset-0 z-10 bg-white rounded-[0.75rem] overflow-y-auto shadow-md shadow-gray-400"
             style={{ opacity: 0, transform: "translateY(100%)" }}
           >
             <MoreDetails setMoreDetails={setMoreDetails} />
@@ -149,22 +148,22 @@ const PatientPage = () => {
       </div>
 
       {/* Documents List */}
-      <div className="col-start-2 col-end-6 row-start-4 row-end-6 bg-white border-2 border-gray-200 rounded-[1rem] shadow-xl m-2 overflow-hidden">
-        <h2 className="text-xl font-semibold p-3 border-b border-gray-200">
+      <div className="col-start-2 col-end-6 row-start-4 row-end-6 bg-white border border-gray-200 rounded-[0.75rem] shadow-lg m-2 overflow-hidden">
+        <h2 className="text-base font-semibold p-3 border-b border-gray-200 bg-gray-50">
           Processed Documents
         </h2>
-        <div className="h-[calc(100%-80px)] overflow-y-auto p-3 pt-2">
+        <div className="h-[calc(100%-56px)] overflow-y-auto p-3">
           <div className="space-y-2">
             {documents.map((doc, index) => (
               <div
                 key={index}
-                className="flex items-center justify-between bg-gray-50 p-2 rounded-[1rem] shadow hover:shadow-md transition-shadow border border-gray-100"
+                className="flex items-center justify-between bg-white p-3 rounded-lg hover:bg-gray-50 transition-all duration-200 border border-gray-100 shadow-sm hover:shadow-md"
               >
-                <div className="flex items-center gap-4">
-                  <div className="p-2 bg-blue-100 rounded-[1rem]">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-blue-100 rounded-lg">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5 text-blue-600"
+                      className="h-4 w-4 text-blue-600"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -178,20 +177,22 @@ const PatientPage = () => {
                     </svg>
                   </div>
                   <div>
-                    <h3 className="font-medium text-base">{doc.name}</h3>
-                    <p className="text-xs text-gray-500">
+                    <h3 className="font-medium text-sm text-gray-800">
+                      {doc.name}
+                    </h3>
+                    <p className="text-xs text-gray-500 mt-0.5">
                       {new Date(doc.date).toLocaleDateString()} • {doc.type}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
-                  <div className="text-center">
-                    <span className="block font-semibold text-base">
+                  <div className="text-center bg-gray-50 px-3 py-1 rounded-full">
+                    <span className="block font-semibold text-sm text-gray-800">
                       {doc.score}
                     </span>
                     <span className="text-xs text-gray-500">Score</span>
                   </div>
-                  <button className="p-1.5 hover:bg-gray-100 rounded-[1rem]">
+                  <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       className="h-4 w-4 text-gray-600"
@@ -208,62 +209,68 @@ const PatientPage = () => {
         </div>
       </div>
 
-      <div className="col-start-2 col-end-4 row-start-1 row-end-4 bg-white p-4 border-2 border-gray-200 rounded-[1rem] shadow-xl m-2 mt-5">
-        <h2 className="text-xl font-semibold mb-4">Health Pillars Score</h2>
-        <div className="grid grid-cols-2 gap-6">
+      <div className="col-start-2 col-end-4 row-start-1 row-end-4 bg-white p-3 border border-gray-200 rounded-[0.75rem] shadow-lg m-2 mt-4">
+        <h2 className="text-base font-semibold mb-3">Health Pillars Score</h2>
+        <div className="grid grid-cols-2 gap-4">
           {/* Nutrition Score */}
-          <div className="bg-green-50 p-4 rounded-[1rem]">
-            <div className="flex justify-between items-center mb-2">
-              <span className="font-medium text-green-700">
+          <div className="bg-green-50 p-3 rounded-[0.75rem]">
+            <div className="flex justify-between items-center mb-1.5">
+              <span className="text-sm font-medium text-green-700">
                 Nutrition Score
               </span>
-              <span className="text-2xl font-bold text-green-600">85</span>
+              <span className="text-lg font-bold text-green-600">85</span>
             </div>
-            <div className="w-full bg-green-200 rounded-[1rem] h-2">
+            <div className="w-full bg-green-200 rounded-[0.75rem] h-1.5">
               <div
-                className="bg-green-600 h-2 rounded-[1rem]"
+                className="bg-green-600 h-1.5 rounded-[0.75rem]"
                 style={{ width: "85%" }}
               ></div>
             </div>
           </div>
 
           {/* Exercise Score */}
-          <div className="bg-blue-50 p-4 rounded-[1rem]">
-            <div className="flex justify-between items-center mb-2">
-              <span className="font-medium text-blue-700">Exercise Score</span>
-              <span className="text-2xl font-bold text-blue-600">78</span>
+          <div className="bg-blue-50 p-3 rounded-[0.75rem]">
+            <div className="flex justify-between items-center mb-1.5">
+              <span className="text-sm font-medium text-blue-700">
+                Exercise Score
+              </span>
+              <span className="text-lg font-bold text-blue-600">78</span>
             </div>
-            <div className="w-full bg-blue-200 rounded-[1rem] h-2">
+            <div className="w-full bg-blue-200 rounded-[0.75rem] h-1.5">
               <div
-                className="bg-blue-600 h-2 rounded-[1rem]"
+                className="bg-blue-600 h-1.5 rounded-[0.75rem]"
                 style={{ width: "78%" }}
               ></div>
             </div>
           </div>
 
           {/* Mental Health Score */}
-          <div className="bg-purple-50 p-4 rounded-[1rem]">
-            <div className="flex justify-between items-center mb-2">
-              <span className="font-medium text-purple-700">Mental Health</span>
-              <span className="text-2xl font-bold text-purple-600">92</span>
+          <div className="bg-purple-50 p-3 rounded-[0.75rem]">
+            <div className="flex justify-between items-center mb-1.5">
+              <span className="text-sm font-medium text-purple-700">
+                Mental Health
+              </span>
+              <span className="text-lg font-bold text-purple-600">92</span>
             </div>
-            <div className="w-full bg-purple-200 rounded-[1rem] h-2">
+            <div className="w-full bg-purple-200 rounded-[0.75rem] h-1.5">
               <div
-                className="bg-purple-600 h-2 rounded-[1rem]"
+                className="bg-purple-600 h-1.5 rounded-[0.75rem]"
                 style={{ width: "92%" }}
               ></div>
             </div>
           </div>
 
           {/* Sleep Quality Score */}
-          <div className="bg-indigo-50 p-4 rounded-[1rem]">
-            <div className="flex justify-between items-center mb-2">
-              <span className="font-medium text-indigo-700">Sleep Quality</span>
-              <span className="text-2xl font-bold text-indigo-600">88</span>
+          <div className="bg-indigo-50 p-3 rounded-[0.75rem]">
+            <div className="flex justify-between items-center mb-1.5">
+              <span className="text-sm font-medium text-indigo-700">
+                Sleep Quality
+              </span>
+              <span className="text-lg font-bold text-indigo-600">88</span>
             </div>
-            <div className="w-full bg-indigo-200 rounded-[1rem] h-2">
+            <div className="w-full bg-indigo-200 rounded-[0.75rem] h-1.5">
               <div
-                className="bg-indigo-600 h-2 rounded-[1rem]"
+                className="bg-indigo-600 h-1.5 rounded-[0.75rem]"
                 style={{ width: "88%" }}
               ></div>
             </div>
@@ -271,15 +278,15 @@ const PatientPage = () => {
         </div>
 
         {/* Prevention Alerts */}
-        <div className="mt-6">
-          <h3 className="text-lg font-semibold mb-3 text-gray-700">
+        <div className="mt-4 h-[200px] flex flex-col">
+          <h3 className="text-sm font-semibold mb-2 text-gray-700">
             Prevention Alerts
           </h3>
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 bg-yellow-50 p-3 rounded-[1rem] border border-yellow-200">
+          <div className="space-y-1.5 overflow-y-auto flex-1">
+            <div className="flex items-center gap-2 bg-yellow-50 p-2 rounded-[0.75rem] border border-yellow-200">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5 text-yellow-600"
+                className="h-4 w-4 text-yellow-600"
                 viewBox="0 0 20 20"
                 fill="currentColor"
               >
@@ -289,14 +296,31 @@ const PatientPage = () => {
                   clipRule="evenodd"
                 />
               </svg>
-              <span className="text-yellow-800">
+              <span className="text-xs text-yellow-800">
                 Due for annual health checkup
               </span>
             </div>
-            <div className="flex items-center gap-2 bg-red-50 p-3 rounded-[1rem] border border-red-200">
+            <div className="flex items-center gap-2 bg-yellow-50 p-2 rounded-[0.75rem] border border-yellow-200">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5 text-red-600"
+                className="h-4 w-4 text-yellow-600"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <span className="text-xs text-yellow-800">
+                Due for annual health checkup
+              </span>
+            </div>
+            <div className="flex items-center gap-2 bg-red-50 p-2 rounded-[0.75rem] border border-red-200">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4 text-red-600"
                 viewBox="0 0 20 20"
                 fill="currentColor"
               >
@@ -306,7 +330,7 @@ const PatientPage = () => {
                   clipRule="evenodd"
                 />
               </svg>
-              <span className="text-red-800">
+              <span className="text-xs text-red-800">
                 Blood pressure trending higher
               </span>
             </div>
@@ -314,14 +338,14 @@ const PatientPage = () => {
         </div>
       </div>
 
-      <div className="col-start-4 col-end-6 row-start-1 row-end-4 bg-white p-4 border-2 border-gray-200 rounded-[1rem] shadow-xl m-2 mt-5">
-        <h2 className="text-xl font-semibold mb-4">Patient Actions</h2>
-        <div className="grid grid-cols-2 gap-4">
+      <div className="col-start-4 col-end-6 row-start-1 row-end-4 bg-white p-3 border border-gray-200 rounded-[0.75rem] shadow-lg m-2 mt-4">
+        <h2 className="text-base font-semibold mb-3">Patient Actions</h2>
+        <div className="grid grid-cols-2 gap-4 h-[calc(100%-3rem)]">
           {/* Update Patient Values Button */}
-          <button className="flex items-center justify-center gap-2 p-4 bg-blue-100 rounded-[1rem] hover:bg-blue-200 transition-colors">
+          <button className="flex items-center justify-center gap-2 py-4 px-3 bg-blue-100 rounded-[0.75rem] hover:bg-blue-200 transition-colors">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6 text-blue-600"
+              className="h-5 w-5 text-blue-600"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -333,14 +357,16 @@ const PatientPage = () => {
                 d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
               />
             </svg>
-            <span className="font-medium text-blue-600">Update Values</span>
+            <span className="text-sm font-medium text-blue-600">
+              Update Values
+            </span>
           </button>
 
           {/* Upload New Document Button */}
-          <button className="flex items-center justify-center gap-2 p-4 bg-green-100 rounded-[1rem] hover:bg-green-200 transition-colors">
+          <button className="flex items-center justify-center gap-2 py-4 px-3 bg-green-100 rounded-[0.75rem] hover:bg-green-200 transition-colors">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6 text-green-600"
+              className="h-5 w-5 text-green-600"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -352,14 +378,16 @@ const PatientPage = () => {
                 d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
               />
             </svg>
-            <span className="font-medium text-green-600">Upload Document</span>
+            <span className="text-sm font-medium text-green-600">
+              Upload Document
+            </span>
           </button>
 
           {/* Generate New Report Button */}
-          <button className="flex items-center justify-center gap-2 p-4 bg-purple-100 rounded-[1rem] hover:bg-purple-200 transition-colors">
+          <button className="flex items-center justify-center gap-2 py-4 px-3 bg-purple-100 rounded-[0.75rem] hover:bg-purple-200 transition-colors">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6 text-purple-600"
+              className="h-5 w-5 text-purple-600"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -371,14 +399,16 @@ const PatientPage = () => {
                 d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
               />
             </svg>
-            <span className="font-medium text-purple-600">Generate Report</span>
+            <span className="text-sm font-medium text-purple-600">
+              Generate Report
+            </span>
           </button>
 
           {/* View History Button */}
-          <button className="flex items-center justify-center gap-2 p-4 bg-orange-100 rounded-[1rem] hover:bg-orange-200 transition-colors">
+          <button className="flex items-center justify-center gap-2 py-4 px-3 bg-orange-100 rounded-[0.75rem] hover:bg-orange-200 transition-colors">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6 text-orange-600"
+              className="h-5 w-5 text-orange-600"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -390,14 +420,16 @@ const PatientPage = () => {
                 d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
               />
             </svg>
-            <span className="font-medium text-orange-600">View History</span>
+            <span className="text-sm font-medium text-orange-600">
+              View History
+            </span>
           </button>
 
           {/* Send Email Button */}
-          <button className="flex items-center justify-center gap-2 p-4 bg-red-100 rounded-[1rem] hover:bg-red-200 transition-colors">
+          <button className="flex items-center justify-center gap-2 py-4 px-3 bg-red-100 rounded-[0.75rem] hover:bg-red-200 transition-colors">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6 text-red-600"
+              className="h-5 w-5 text-red-600"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -409,14 +441,16 @@ const PatientPage = () => {
                 d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
               />
             </svg>
-            <span className="font-medium text-red-600">Send Report</span>
+            <span className="text-sm font-medium text-red-600">
+              Send Report
+            </span>
           </button>
 
           {/* Export Data Button */}
-          <button className="flex items-center justify-center gap-2 p-4 bg-teal-100 rounded-[1rem] hover:bg-teal-200 transition-colors">
+          <button className="flex items-center justify-center gap-2 py-4 px-3 bg-teal-100 rounded-[0.75rem] hover:bg-teal-200 transition-colors">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6 text-teal-600"
+              className="h-5 w-5 text-teal-600"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -428,7 +462,9 @@ const PatientPage = () => {
                 d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
               />
             </svg>
-            <span className="font-medium text-teal-600">Export Data</span>
+            <span className="text-sm font-medium text-teal-600">
+              Export Data
+            </span>
           </button>
         </div>
       </div>
