@@ -1,13 +1,13 @@
 import React from "react";
 import DoctorNavbar from "../Components-1/DoctorNavbar";
-import PatientFXN from "../Components-1/PatientFXN";
+import PatientList from "../Components-1/PatientList";
 
 const DoctorPage = () => {
   return (
     <>
-      <div className="h-screen">
+      <div className="h-screen ">
         <DoctorNavbar />
-        <PatientFXN />
+        <PatientList />
       </div>
     </>
   );

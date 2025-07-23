@@ -17,7 +17,7 @@ const PatientInterface = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex flex-col items-center px-4 sm:px-6 py-8 sm:py-12 font-sans gap-4 sm:gap-5">
       {/* Profile Picture & Name */}
-      <div className="flex flex-col items-center mb-6 sm:mb-8">
+      <div className="flex flex-col items-center mb-2 sm:mb-8">
         <div className="relative">
           <img
             src="https://images.rawpixel.com/image_800/czNmcy1wcml2YXRlL3Jhd3BpeGVsX2ltYWdlcy93ZWJzaXRlX2NvbnRlbnQvbHIvczc3LW1ja2luc2V5LTc2MTEtcG9tXzMuanBn.jpg"
@@ -32,7 +32,7 @@ const PatientInterface = () => {
       </div>
 
       {/* Pillar Cards */}
-      <div className="grid grid-cols-2 gap-3 sm:gap-5 mb-10 sm:mb-16 w-full max-w-md">
+      <div className="grid grid-cols-2 gap-3 sm:gap-5 mb-5 sm:mb-16 w-full max-w-md">
         {pillars.map((pillar, index) => (
           <div
             key={index}
@@ -52,6 +52,43 @@ const PatientInterface = () => {
             </div>
           </div>
         ))}
+      </div>
+
+      <div className="w-full max-w-md">
+        <label className="group flex flex-col items-center justify-center w-full p-6 bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer border-2 border-dashed border-gray-300 hover:border-blue-400">
+          <input
+            type="file"
+            accept=".pdf"
+            className="hidden"
+            onChange={(e) => console.log(e.target.files[0])}
+          />
+          <div className="flex flex-col items-center gap-3">
+            <div className="p-3 bg-blue-50 rounded-full group-hover:bg-blue-100 transition-colors duration-300">
+              <svg
+                className="w-8 h-8 text-blue-500 group-hover:text-blue-600 transition-colors duration-300"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+                />
+              </svg>
+            </div>
+            <div className="text-center">
+              <p className="text-lg font-semibold text-gray-700 group-hover:text-blue-600 transition-colors duration-300">
+                Upload Reports (PDF)
+              </p>
+              <p className="text-sm text-gray-500 mt-1">
+                Click or drag and drop your files here
+              </p>
+            </div>
+          </div>
+        </label>
       </div>
 
       {/* Linktree Buttons */}

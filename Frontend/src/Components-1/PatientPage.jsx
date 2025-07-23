@@ -74,7 +74,7 @@ const PatientPage = () => {
 
         {/* Basic Info */}
         <div className="w-[90%] flex flex-col items-center my-6 space-y-2">
-          <span className="text-lg font-semibold">Diego Carbonell</span>
+          <span className="text-lg font-semibold">John Doe</span>
           <span className="text-sm text-gray-500 font-medium italic">
             30/06/2025
           </span>

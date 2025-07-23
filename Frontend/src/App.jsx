@@ -4,6 +4,8 @@ import { Routes, Route } from "react-router-dom";
 import AddPatient from "./Components-1/AddPatient";
 import PatientPage from "./Components-1/PatientPage";
 import LoginPage from "./Components-1/LoginPage";
+import AdminInterface from "./Pages/AdminInterface";
+import PatientInterface from "./Pages/PatientInterface";
 
 const App = () => {
   return (
@@ -14,6 +16,7 @@ const App = () => {
         <Route path="/patient" element={<PatientPage />} />
       </Routes>
       {/* <PatientInterface /> */}
+      {/* <AdminInterface /> */}
     </>
   );
 };

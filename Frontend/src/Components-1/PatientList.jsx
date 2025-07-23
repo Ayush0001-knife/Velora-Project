@@ -1,9 +1,12 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiSearch } from "react-icons/fi";
+import { useTranslation } from "react-i18next";
 
 const PatientList = () => {
   const navigate = useNavigate();
+
+  const { t } = useTranslation();
 
   const data = [
     {
@@ -69,6 +72,27 @@ const PatientList = () => {
       bmi: 25.3,
       reportGenerated: false,
     },
+    {
+      name: "Arun Desai",
+      sex: "Male",
+      age: 41,
+      bmi: 25.3,
+      reportGenerated: false,
+    },
+    {
+      name: "Arun Desai",
+      sex: "Male",
+      age: 41,
+      bmi: 25.3,
+      reportGenerated: false,
+    },
+    {
+      name: "John Desai",
+      sex: "Male",
+      age: 41,
+      bmi: 25.3,
+      reportGenerated: false,
+    },
   ];
 
   const [list, setList] = useState(data);
@@ -92,10 +116,10 @@ const PatientList = () => {
   );
 
   return (
-    <div className="w-[95%] h-[95vh] mx-auto my-[2.5vh] bg-white rounded-2xl shadow-lg flex flex-col ">
+    <div className="w-[80%] h-[70vh] mx-auto bg-white rounded-2xl shadow-lg flex flex-col mt-5">
       {/* Header */}
       <div className="bg-blue-500 text-white p-6 flex-shrink-0 rounded-t-2xl">
-        <h1 className="text-2xl font-bold mb-4">Patient Records</h1>
+        <h1 className="text-2xl font-bold mb-4">{t("patient_records")}</h1>
         <div className="flex items-center justify-between w-full">
           <div className="flex items-center">
             <input
@@ -113,7 +137,7 @@ const PatientList = () => {
             onClick={() => navigate("/add-patient")}
           >
             <span className="text-lg font-semibold text-blue-600">
-              Add Patient +
+              {t("add_patient")} +
             </span>
           </button>
         </div>
@@ -125,31 +149,31 @@ const PatientList = () => {
           onClick={() => handleSort("name")}
           className="w-[20%] px-4 font-semibold text-gray-700 cursor-pointer hover:text-blue-500"
         >
-          Patient Name
+          {t("patient_name")}
         </div>
         <div
           onClick={() => handleSort("sex")}
           className="w-[15%] px-4 text-center font-semibold text-gray-700 cursor-pointer hover:text-blue-500"
         >
-          Gender
+          {t("gender")}
         </div>
         <div
           onClick={() => handleSort("age")}
           className="w-[15%] px-4 text-center font-semibold text-gray-700 cursor-pointer hover:text-blue-500"
         >
-          Age
+          {t("age")}
         </div>
         <div
           onClick={() => handleSort("bmi")}
           className="w-[15%] px-4 text-center font-semibold text-gray-700 cursor-pointer hover:text-blue-500"
         >
-          BMI
+          {t("bmi")}
         </div>
         <div
           onClick={() => handleSort("reportGenerated")}
           className="w-[20%] px-4 text-center font-semibold text-gray-700 cursor-pointer hover:text-blue-500"
         >
-          Status
+          {t("status")}
         </div>
       </div>
 
