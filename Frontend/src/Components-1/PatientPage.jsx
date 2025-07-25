@@ -2,10 +2,12 @@ import React, { useRef, useState } from "react";
 import MoreDetails from "./MoreDetails";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
+import { useTranslation } from "react-i18next";
 
 const PatientPage = () => {
   const moreDetailsRef = useRef(null);
   const [moreDetails, setMoreDetails] = useState(false);
+  const { t } = useTranslation();
 
   // Sample processed documents data
   const [documents] = useState([
@@ -89,20 +91,22 @@ const PatientPage = () => {
           <div className="flex flex-col w-full h-full gap-2 bg-white border border-gray-600 shadow-md shadow-gray-400 rounded-[0.75rem] p-3 z-0">
             <div className="grid grid-cols-2 gap-3">
               {[
-                ["Age", "32"],
-                ["Sex", "Male"],
-                ["Blood Group", "O+"],
-                ["Height", "175 cm"],
-                ["Weight", "70 kg"],
-                ["BMI", "22.9"],
-                ["Sports/week", "10"],
-                ["Vo2 max", "22"],
-                ["Exercise/week", "7 hr"],
-                ["Sleep/Night", "8 hr"],
-                ["Steps/day", "10000"],
+                [t("patient_age"), t("32")],
+                [t("patient_sex"), t("male")],
+                [t("blood_group"), t("o_plus")],
+                [t("patient_height"), t("one_seventy_five_cm")],
+                [t("patient_weight"), t("seventy_kg")],
+                [t("patient_bmi"), t("twenty_two_point_nine")],
+                [t("sports_week"), t("ten")],
+                [t("vo2_max"), t("twenty_two")],
+                [t("exercise_week"), t("seven_hours")],
+                [t("sleep_night"), t("eight_hours")],
+                [t("steps_day"), t("ten_thousand")],
               ].map(([label, value]) => (
                 <div className="flex flex-col" key={label}>
-                  <span className="text-sm font-medium">{label}</span>
+                  <span className="text-sm font-medium capitalize">
+                    {label}
+                  </span>
                   <span className="text-xs text-gray-500">{value}</span>
                 </div>
               ))}
@@ -124,7 +128,9 @@ const PatientPage = () => {
                   d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                 />
               </svg>
-              <span className="text-xs font-medium">See pathology report</span>
+              <span className="text-xs font-medium">
+                {t("see_pathology_report")}
+              </span>
             </div>
 
             {/* Toggle more details */}
@@ -150,7 +156,7 @@ const PatientPage = () => {
       {/* Documents List */}
       <div className="col-start-2 col-end-6 row-start-4 row-end-6 bg-white border border-gray-200 rounded-[0.75rem] shadow-lg m-2 overflow-hidden">
         <h2 className="text-base font-semibold p-3 border-b border-gray-200 bg-gray-50">
-          Processed Documents
+          {t("processed_documents")}
         </h2>
         <div className="h-[calc(100%-56px)] overflow-y-auto p-3">
           <div className="space-y-2">
@@ -178,10 +184,10 @@ const PatientPage = () => {
                   </div>
                   <div>
                     <h3 className="font-medium text-sm text-gray-800">
-                      {doc.name}
+                      {doc.name}{" "}
                     </h3>
                     <p className="text-xs text-gray-500 mt-0.5">
-                      {new Date(doc.date).toLocaleDateString()} • {doc.type}
+                      {new Date(doc.date).toLocaleDateString()} • {doc.date}
                     </p>
                   </div>
                 </div>
@@ -190,7 +196,9 @@ const PatientPage = () => {
                     <span className="block font-semibold text-sm text-gray-800">
                       {doc.score}
                     </span>
-                    <span className="text-xs text-gray-500">Score</span>
+                    <span className="text-xs text-gray-500">
+                      Document Score
+                    </span>
                   </div>
                   <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
                     <svg
@@ -210,13 +218,15 @@ const PatientPage = () => {
       </div>
 
       <div className="col-start-2 col-end-4 row-start-1 row-end-4 bg-white p-3 border border-gray-200 rounded-[0.75rem] shadow-lg m-2 mt-4">
-        <h2 className="text-base font-semibold mb-3">Health Pillars Score</h2>
+        <h2 className="text-base font-semibold mb-3">
+          {t("health_pillars_score")}
+        </h2>
         <div className="grid grid-cols-2 gap-4">
           {/* Nutrition Score */}
           <div className="bg-green-50 p-3 rounded-[0.75rem]">
             <div className="flex justify-between items-center mb-1.5">
               <span className="text-sm font-medium text-green-700">
-                Nutrition Score
+                {t("nutrition_score")}
               </span>
               <span className="text-lg font-bold text-green-600">85</span>
             </div>
@@ -232,7 +242,7 @@ const PatientPage = () => {
           <div className="bg-blue-50 p-3 rounded-[0.75rem]">
             <div className="flex justify-between items-center mb-1.5">
               <span className="text-sm font-medium text-blue-700">
-                Exercise Score
+                {t("exercise_score")}
               </span>
               <span className="text-lg font-bold text-blue-600">78</span>
             </div>
@@ -248,7 +258,7 @@ const PatientPage = () => {
           <div className="bg-purple-50 p-3 rounded-[0.75rem]">
             <div className="flex justify-between items-center mb-1.5">
               <span className="text-sm font-medium text-purple-700">
-                Mental Health
+                {t("mental_health")}
               </span>
               <span className="text-lg font-bold text-purple-600">92</span>
             </div>
@@ -264,7 +274,7 @@ const PatientPage = () => {
           <div className="bg-indigo-50 p-3 rounded-[0.75rem]">
             <div className="flex justify-between items-center mb-1.5">
               <span className="text-sm font-medium text-indigo-700">
-                Sleep Quality
+                {t("sleep_quality")}
               </span>
               <span className="text-lg font-bold text-indigo-600">88</span>
             </div>
@@ -280,7 +290,7 @@ const PatientPage = () => {
         {/* Prevention Alerts */}
         <div className="mt-4 h-[200px] flex flex-col">
           <h3 className="text-sm font-semibold mb-2 text-gray-700">
-            Prevention Alerts
+            {t("prevention_alerts")}
           </h3>
           <div className="space-y-1.5 overflow-y-auto flex-1">
             <div className="flex items-center gap-2 bg-yellow-50 p-2 rounded-[0.75rem] border border-yellow-200">
@@ -297,7 +307,7 @@ const PatientPage = () => {
                 />
               </svg>
               <span className="text-xs text-yellow-800">
-                Due for annual health checkup
+                Annual Checkup Due
               </span>
             </div>
             <div className="flex items-center gap-2 bg-yellow-50 p-2 rounded-[0.75rem] border border-yellow-200">
@@ -314,7 +324,7 @@ const PatientPage = () => {
                 />
               </svg>
               <span className="text-xs text-yellow-800">
-                Due for annual health checkup
+                Annual Checkup Due
               </span>
             </div>
             <div className="flex items-center gap-2 bg-red-50 p-2 rounded-[0.75rem] border border-red-200">
@@ -330,16 +340,14 @@ const PatientPage = () => {
                   clipRule="evenodd"
                 />
               </svg>
-              <span className="text-xs text-red-800">
-                Blood pressure trending higher
-              </span>
+              <span className="text-xs text-red-800">Blood Pressure High</span>
             </div>
           </div>
         </div>
       </div>
 
       <div className="col-start-4 col-end-6 row-start-1 row-end-4 bg-white p-3 border border-gray-200 rounded-[0.75rem] shadow-lg m-2 mt-4">
-        <h2 className="text-base font-semibold mb-3">Patient Actions</h2>
+        <h2 className="text-base font-semibold mb-3">{t("patient_actions")}</h2>
         <div className="grid grid-cols-2 gap-4 h-[calc(100%-3rem)]">
           {/* Update Patient Values Button */}
           <button className="flex items-center justify-center gap-2 py-4 px-3 bg-blue-100 rounded-[0.75rem] hover:bg-blue-200 transition-colors">
@@ -358,7 +366,7 @@ const PatientPage = () => {
               />
             </svg>
             <span className="text-sm font-medium text-blue-600">
-              Update Values
+              {t("update_values")}
             </span>
           </button>
 
@@ -379,7 +387,7 @@ const PatientPage = () => {
               />
             </svg>
             <span className="text-sm font-medium text-green-600">
-              Upload Document
+              {t("upload_document")}
             </span>
           </button>
 
@@ -400,7 +408,7 @@ const PatientPage = () => {
               />
             </svg>
             <span className="text-sm font-medium text-purple-600">
-              Generate Report
+              {t("generate_report")}
             </span>
           </button>
 
@@ -421,7 +429,7 @@ const PatientPage = () => {
               />
             </svg>
             <span className="text-sm font-medium text-orange-600">
-              View History
+              {t("view_history")}
             </span>
           </button>
 
@@ -442,7 +450,7 @@ const PatientPage = () => {
               />
             </svg>
             <span className="text-sm font-medium text-red-600">
-              Send Report
+              {t("send_report")}
             </span>
           </button>
 
@@ -463,7 +471,7 @@ const PatientPage = () => {
               />
             </svg>
             <span className="text-sm font-medium text-teal-600">
-              Export Data
+              {t("export_data")}
             </span>
           </button>
         </div>

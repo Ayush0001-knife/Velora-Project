@@ -8,8 +8,6 @@ import {
   Search,
   Filter,
   MoreHorizontal,
-  Users,
-  TrendingUp,
   Activity,
   Settings,
   Bell,
@@ -19,9 +17,12 @@ import {
   Save,
   X,
   Calendar,
-  Clock,
-  Star,
+  FolderGit,
 } from "lucide-react";
+import ReportGenerationTab from "../Components2/code/ReportGeneration";
+import Dashboard from "../Components2/code/Dashboard";
+import ChatManagement from "../Components2/code/ChatManagement";
+import { useTranslation } from "react-i18next";
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -43,32 +44,7 @@ export default function AdminDashboard() {
     },
   ]);
 
-  const [chatSessions, setChatSessions] = useState([
-    {
-      id: 1,
-      type: "4-pillars",
-      user: "John Doe",
-      messages: 45,
-      lastActivity: "2024-01-30 14:30",
-      status: "active",
-    },
-    {
-      id: 2,
-      type: "general",
-      user: "Jane Smith",
-      messages: 23,
-      lastActivity: "2024-01-30 13:45",
-      status: "active",
-    },
-    {
-      id: 3,
-      type: "4-pillars",
-      user: "Mike Johnson",
-      messages: 67,
-      lastActivity: "2024-01-30 12:15",
-      status: "completed",
-    },
-  ]);
+  const { t } = useTranslation();
 
   const [selectedRecipe, setSelectedRecipe] = useState(null);
   const [showRecipeModal, setShowRecipeModal] = useState(false);
@@ -233,7 +209,7 @@ export default function AdminDashboard() {
             <div className="flex items-center">
               <div className="flex-shrink-0">
                 <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-                  Admin Dashboard
+                  {t("admin_dashboard")}
                 </h1>
               </div>
             </div>
@@ -259,9 +235,10 @@ export default function AdminDashboard() {
         {/* Navigation Tabs */}
         <div className="flex space-x-1 mb-8 bg-white p-1 rounded-xl shadow-sm">
           {[
-            { id: "dashboard", label: "Dashboard", icon: Activity },
-            { id: "chats", label: "Chat Management", icon: MessageCircle },
-            { id: "recipes", label: "Recipe Management", icon: BookOpen },
+            { id: "dashboard", label: t("dashboard"), icon: Activity },
+            { id: "chats", label: t("chats"), icon: MessageCircle },
+            { id: "recipes", label: t("recipes"), icon: BookOpen },
+            { id: "report", label: t("report"), icon: FolderGit },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -279,269 +256,24 @@ export default function AdminDashboard() {
         </div>
 
         {/* Dashboard Overview */}
-        {activeTab === "dashboard" && (
-          <div className="space-y-8">
-            {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[
-                {
-                  label: "Total Recipes",
-                  value: "1,234",
-                  change: "+12%",
-                  icon: BookOpen,
-                  color: "from-blue-500 to-cyan-500",
-                },
-                {
-                  label: "Active Chats",
-                  value: "89",
-                  change: "+5%",
-                  icon: MessageCircle,
-                  color: "from-green-500 to-emerald-500",
-                },
-                {
-                  label: "Users Online",
-                  value: "45",
-                  change: "+8%",
-                  icon: Users,
-                  color: "from-purple-500 to-pink-500",
-                },
-                {
-                  label: "Avg Rating",
-                  value: "4.8",
-                  change: "+0.2",
-                  icon: Star,
-                  color: "from-yellow-500 to-orange-500",
-                },
-              ].map((stat, index) => (
-                <div
-                  key={index}
-                  className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-                >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-gray-600 font-medium">
-                        {stat.label}
-                      </p>
-                      <p className="text-3xl font-bold text-gray-900 mt-1">
-                        {stat.value}
-                      </p>
-                      <p className="text-sm text-green-600 mt-1">
-                        {stat.change}
-                      </p>
-                    </div>
-                    <div
-                      className={`w-12 h-12 rounded-xl bg-gradient-to-r ${stat.color} flex items-center justify-center`}
-                    >
-                      <stat.icon size={24} className="text-white" />
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Recent Activity */}
-            <div className="bg-white rounded-2xl shadow-lg p-6">
-              <h3 className="text-xl font-bold text-gray-900 mb-6">
-                Recent Activity
-              </h3>
-              <div className="space-y-4">
-                {[
-                  {
-                    action: "New recipe added",
-                    detail: "Chicken Parmesan by John Doe",
-                    time: "2 hours ago",
-                    type: "recipe",
-                  },
-                  {
-                    action: "Chat session completed",
-                    detail: "4-pillars chat with Jane Smith",
-                    time: "3 hours ago",
-                    type: "chat",
-                  },
-                  {
-                    action: "Recipe updated",
-                    detail: "Chocolate Cake rating changed",
-                    time: "5 hours ago",
-                    type: "recipe",
-                  },
-                ].map((activity, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center space-x-4 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"
-                  >
-                    <div
-                      className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                        activity.type === "recipe"
-                          ? "bg-blue-100 text-blue-600"
-                          : "bg-green-100 text-green-600"
-                      }`}
-                    >
-                      {activity.type === "recipe" ? (
-                        <BookOpen size={16} />
-                      ) : (
-                        <MessageCircle size={16} />
-                      )}
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-medium text-gray-900">
-                        {activity.action}
-                      </p>
-                      <p className="text-sm text-gray-600">{activity.detail}</p>
-                    </div>
-                    <div className="text-sm text-gray-500">
-                      <Clock size={14} className="inline mr-1" />
-                      {activity.time}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
+        {activeTab === "dashboard" && <Dashboard />}
 
         {/* Chat Management */}
-        {activeTab === "chats" && (
-          <div className="space-y-6">
-            <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-bold text-gray-900">
-                Chat Management
-              </h2>
-              <div className="flex space-x-4">
-                <div className="relative">
-                  <Search
-                    size={20}
-                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Search chats..."
-                    className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  />
-                </div>
-                <select className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                  <option value="all">All Types</option>
-                  <option value="nutritional">Nutritional</option>
-                  <option value="mental">Mental Health</option>
-                  <option value="exercise">Exercise</option>
-                  <option value="sleep">Sleep</option>
-                  <option value="general">General</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Chat Type
-                      </th>
-                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Knowledge Base
-                      </th>
-                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        AI Model
-                      </th>
-                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Language
-                      </th>
-                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Status
-                      </th>
-                      <th className="px-6 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {[
-                      { id: 1, type: "Nutritional", status: "active" },
-                      { id: 2, type: "Mental Health", status: "active" },
-                      { id: 3, type: "Exercise", status: "active" },
-                      { id: 4, type: "Sleep", status: "active" },
-                      { id: 5, type: "General", status: "active" },
-                    ].map((chat) => (
-                      <tr
-                        key={chat.id}
-                        className="hover:bg-gray-50 transition-colors"
-                      >
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center">
-                            <div className="w-10 h-10 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center">
-                              <MessageCircle size={16} className="text-white" />
-                            </div>
-                            <div className="ml-4">
-                              <div className="text-sm font-medium text-gray-900">
-                                {chat.type}
-                              </div>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <select className="px-3 py-1 text-sm border border-gray-300 rounded-full focus:ring-2 focus:ring-purple-500">
-                            <option value="kb1">Knowledge Base 1</option>
-                            <option value="kb2">Knowledge Base 2</option>
-                            <option value="kb3">Knowledge Base 3</option>
-                          </select>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <select className="px-3 py-1 text-sm border border-gray-300 rounded-full focus:ring-2 focus:ring-purple-500">
-                            <option value="gpt4">GPT-4</option>
-                            <option value="gpt35">GPT-3.5</option>
-                            <option value="claude">Claude</option>
-                          </select>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <select className="px-3 py-1 text-sm border border-gray-300 rounded-full focus:ring-2 focus:ring-purple-500">
-                            <option value="en">English</option>
-                            <option value="es">Spanish</option>
-                            <option value="fr">French</option>
-                          </select>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span
-                            className={`px-3 py-1 text-xs font-medium rounded-full ${
-                              chat.status === "active"
-                                ? "bg-green-100 text-green-800"
-                                : "bg-gray-100 text-gray-800"
-                            }`}
-                          >
-                            {chat.status}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          <div className="flex justify-end space-x-2">
-                            <button className="text-blue-600 hover:text-blue-800 p-2 hover:bg-blue-50 rounded-full transition-colors">
-                              <Eye size={16} />
-                            </button>
-                            <button className="text-gray-600 hover:text-gray-800 p-2 hover:bg-gray-50 rounded-full transition-colors">
-                              <MoreHorizontal size={16} />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        )}
+        {activeTab === "chats" && <ChatManagement />}
 
         {/* Recipe Management */}
         {activeTab === "recipes" && (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-bold text-gray-900">
-                Recipe Management
+                {t("recipe_management")}
               </h2>
               <button
                 onClick={() => handleRecipeAction("add")}
                 className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-3 rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg"
               >
                 <Plus size={16} className="inline mr-2" />
-                Add Recipe
+                {t("add_recipe")}
               </button>
             </div>
 
@@ -554,7 +286,7 @@ export default function AdminDashboard() {
                 />
                 <input
                   type="text"
-                  placeholder="Search recipes..."
+                  placeholder={t("search_recipes")}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10 pr-4 py-3 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
@@ -566,9 +298,9 @@ export default function AdminDashboard() {
                   onChange={(e) => setFilterStatus(e.target.value)}
                   className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 >
-                  <option value="all">All Status</option>
-                  <option value="published">Published</option>
-                  <option value="draft">Draft</option>
+                  <option value="all">{t("all_status")}</option>
+                  <option value="published">{t("published_status")}</option>
+                  <option value="draft">{t("draft_status")}</option>
                 </select>
                 <button className="px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
                   <Filter size={16} />
@@ -620,13 +352,14 @@ export default function AdminDashboard() {
             {filteredRecipes.length === 0 && (
               <div className="text-center py-12">
                 <BookOpen size={48} className="mx-auto text-gray-400 mb-4" />
-                <p className="text-gray-600">
-                  No recipes found matching your criteria.
-                </p>
+                <p className="text-gray-600">{t("no_recipes_found")}</p>
               </div>
             )}
           </div>
         )}
+
+        {/* Report Generation */}
+        {activeTab === "report" && <ReportGenerationTab />}
       </div>
 
       {/* Recipe Modal */}
