@@ -15,6 +15,8 @@ import {
   Smartphone,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const AddPatient = () => {
   const [activeStep, setActiveStep] = useState(0);
@@ -37,6 +39,14 @@ const AddPatient = () => {
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const navigate = useNavigate();
+
+  const handleAddPatient = () => {
+    console.log(formData);
+    axios.post("http://localhost:3000/api/patients", formData);
+    // navigate("/patient");
   };
 
   // Demographics & Identity

@@ -9,6 +9,7 @@ import { Label } from "../Components2/ui/label";
 import { Input } from "../Components2/ui/input";
 import { cn } from "../lib/utils";
 import ColourfulText from "../Components2/ui/colourful-text";
+import { loginUser } from "../services/api"; // Adjust path if different
 
 export default function LoginPage() {
   const [togglePass1, setTogglePass1] = useState(false);
@@ -16,6 +17,7 @@ export default function LoginPage() {
   const [message, setMessage] = useState("");
   const [bgColor, setBgColor] = useState("");
   const [duration, setDuration] = useState(null);
+  const navigate = useNavigate();
 
   const emailElement = useRef(null);
   const passwordElement = useRef(null);
@@ -42,6 +44,27 @@ export default function LoginPage() {
       setDuration(3000);
       setShowNotification(true);
       return;
+    }
+
+    try {
+      const data = await loginUser({ email, password });
+
+      // Assuming token comes from `data.token` (adjust if different)
+      localStorage.setItem("access_token", data.token);
+
+      setMessage("Login Successful");
+      setBgColor("#088F8F");
+      setDuration(3000);
+      setShowNotification(true);
+
+      navigate("/home");
+    } catch (error) {
+      const errorMsg =
+        error.response?.data?.message || "Login failed. Try again.";
+      setMessage(errorMsg);
+      setBgColor("#FF2400");
+      setDuration(3000);
+      setShowNotification(true);
     }
   };
 

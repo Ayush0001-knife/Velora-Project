@@ -10,13 +10,15 @@ import PatientInterface from "./Pages/PatientInterface";
 const App = () => {
   return (
     <>
-      {/* <Routes>
-        <Route path="/" element={<DoctorPage />} />
+      <Routes>
+        <Route path="/" element={<LoginPage />} />
+        <Route path="/home" element={<DoctorPage />} />
         <Route path="/add-patient" element={<AddPatient />} />
         <Route path="/patient" element={<PatientPage />} />
-      </Routes> */}
+      </Routes>
+
       {/* <PatientInterface /> */}
-      <AdminInterface />
+      {/* <AdminInterface /> */}
     </>
   );
 };
