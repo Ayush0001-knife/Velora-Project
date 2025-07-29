@@ -1108,7 +1108,10 @@ const AddPatient = () => {
                 </button>
               ) : (
                 <div className="flex space-x-3">
-                  <button className="px-8 py-3 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 transition-colors duration-200">
+                  <button
+                    className="px-8 py-3 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 transition-colors duration-200"
+                    onClick={() => console.log(formData)}
+                  >
                     {t("add")}
                   </button>
                 </div>
