@@ -10,7 +10,7 @@ import { Input } from "../Components2/ui/input";
 import { cn } from "../lib/utils";
 import ColourfulText from "../Components2/ui/colourful-text";
 import { loginUser } from "../services/api"; // Adjust path if different
-import { useNavigate } from "react-router-dom";
+import { rsaEncryptPassword } from "../lib/passEncryption"; // Adjust path if different
 
 export default function LoginPage() {
   const [togglePass1, setTogglePass1] = useState(false);
@@ -47,8 +47,12 @@ export default function LoginPage() {
       return;
     }
 
+    const encryptedPassword = rsaEncryptPassword(password);
+
+    console.log(encryptedPassword, email);
+
     try {
-      const data = await loginUser({ email, password });
+      const data = await loginUser({ email, password: encryptedPassword });
 
       // Assuming token comes from `data.token` (adjust if different)
       localStorage.setItem("access_token", data.token);
