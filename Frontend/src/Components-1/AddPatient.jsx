@@ -17,33 +17,145 @@ import {
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { demographics } from "../services/api";
+import { anthropometrics, bloodTests, cardiorespiratory, demographics, exercise, goals, medicalHistory, mentalHealth, nutrition, reportss } from "../services/api";
 
 const AddPatient = () => {
   const [activeStep, setActiveStep] = useState(0);
-  const [demographicsFormData, setDemographicsFormData] = useState({});
-  const [anthropometricsFormData, setAnthropometricsFormData] = useState({});
-  const [cardiorespiratoryFormData, setCardiorespiratoryFormData] = useState(
-    {}
-  );
-  const [nutritionFormData, setNutritionFormData] = useState({});
-  const [bloodTestsFormData, setBloodTestsFormData] = useState({});
-  const [mentalHealthFormData, setMentalHealthFormData] = useState({});
-  const [exerciseFormData, setExerciseFormData] = useState({});
-  const [medicalHistoryFormData, setMedicalHistoryFormData] = useState({});
-  const [goalsFormData, setGoalsFormData] = useState({});
-  const [files, setFiles] = useState([]);
-  const [formData, setFormData] = useState({
-    demographics: demographicsFormData,
-    anthropometrics: anthropometricsFormData,
-    cardiorespiratory: cardiorespiratoryFormData,
-    nutrition: nutritionFormData,
-    bloodTests: bloodTestsFormData,
-    mentalHealth: mentalHealthFormData,
-    exercise: exerciseFormData,
-    medicalHistory: medicalHistoryFormData,
-    goals: goalsFormData,
+  const [patientId, setPatientId] = useState(null);
+  const [demographicsFormData, setDemographicsFormData] = useState({"first_name": "John",
+    "last_name": "Doe",
+    "email": "john.doe@example.com",
+    "age": 30,
+    "gender": "Male",
+    "date_of_birth": "1995-01-01",
+    "phone": "+1234567890",
+    "alternative_phone": "+0987654321",
+    "address": "123 Main St",
+    "state": "California",
+    "country": "USA",
+    "zip_code": "90001",
+    "status": "Active",
+    "created_by": "admin",
+    "assigned_doctor_id": "doctor_123",
+    "gender_identity": "Non-binary",
+    "ethnicity": "Asian",
+    "country_of_residence": "USA",
+    "occupation": "Software Engineer",
+    "socioeconomic_indicator": "Middle Class"});
+  const [anthropometricsFormData, setAnthropometricsFormData] = useState({"weight_kg": 0,
+  "height_cm": 0,
+  "bmi": 0,
+  "waist_circumference_cm": 0,
+  "hip_circumference_cm": 0,
+  "waist_to_hip_ratio": 0,
+  "body_fat_percent": 0,
+  "muscle_mass_percent": 0,
+  "visceral_fat_level": 0,
+  "bone_mass": 0,
+  "hydration_status": 0
+});
+  const [cardiorespiratoryFormData, setCardiorespiratoryFormData] = useState({
+    "resting_heart_rate_bpm": 0,
+  "blood_pressure_systolic": 0,
+  "blood_pressure_diastolic": 0,
+  "vo2_max": 0,
+  "oxygen_saturation_spo2": 0,
+  "heart_rate_variability_hrv": 0
+});
+  const [nutritionFormData, setNutritionFormData] = useState({ "meals_prepared_at_home_per_week": 0,
+    "daily_servings_fruits_vegetables": 0,
+    "weekly_servings_ultra_processed_foods": 0,
+    "water_intake_liters_per_day":1,
+    "alcohol_intake_drinks_per_week": 0,
+    "vitamin_d_blood_level": 1,
+    "food_allergies_intolerances": "string",
+    "dislikes": "string",
+    "special_diet": "string"});
+  const [bloodTestsFormData, setBloodTestsFormData] = useState({
+    "test_date": "2025-07-31",
+    "fasting_glucose": 0,
+    "hba1c": 0,
+    "total_cholesterol": 0,
+    "ldl": 0,
+    "hdl": 0,
+    "triglycerides": 0,
+    "creatinine": 0,
+    "alt": 0,
+    "ast": 0,
+    "ggt": 0,
+    "uric_acid": 0,
+    "ferritin": 0,
+    "vitamin_b12": 0,
+    "apoa1": 0,
+    "apob": 0,
+    "lipoprotein_a": 0,
+    "small_dense_ldl": 0,
+    "hs_crp": 0,
+    "homocysteine": 0,
+    "fasting_insulin": 0,
+    "homa_ir": 0,
+    "c_peptide": 0,
+    "adiponectin": 0,
+    "omega_3_index": 0,
+    "galectin_3": 0,
+    "testosterone_total": 0,
+    "testosterone_free": 0,
+    "estradiol": 0,
+    "dhea_s": 0,
+    "cortisol": 0,
+    "igf_1": 0,
+    "tsh": 0,
+    "free_t3": 0,
+    "free_t4": 0,
+    "parathyroid_hormone_pth": 0,
+    "vitamin_k2": 0,
+    "fecal_calprotectin": 0,
+    "zonulin": 0,
+    "stool_microbiome_profile": "string"
   });
+  const [mentalHealthFormData, setMentalHealthFormData] = useState({"smoker_status": true,
+  "recreational_drug_use": true,
+  "sleep_quality_scale": 1,
+  "sleep_hours_weekday_average": 1,
+  "sleep_hours_weekend_average": 1,
+  "screen_time_before_bed": 1,
+  "stress_level_scale": 1,
+  "mood_scale": 1,
+  "energy_level_scale": 1,
+  "history_anxiety_depression": true});
+  const [exerciseFormData, setExerciseFormData] = useState({ "weekly_exercise_frequency": 0,
+    "weekly_exercise_type": "string",
+    "weekly_exercise_intensity": "string",
+    "steps_per_day_average": 0,
+    "sedentary_hours_per_day": 0,
+    "mobility_limitations": "string",
+    "type_of_activity_tracker": "string"});
+  const [medicalHistoryFormData, setMedicalHistoryFormData] = useState({"known_medical_conditions": "string",
+  "medications": "string",
+  "supplement_usage": "string",
+  "allergies": "string",
+  "family_history_type2_diabetes": true,
+  "family_history_cardiovascular_disease": true,
+  "family_history_cancer_type": "string",
+  "family_history_alzheimers_parkinsons": true});
+  const [goalsFormData, setGoalsFormData] = useState({});
+  // const [reports,setReports] = useState([]);
+  // const [files, setFiles] = useState({
+  //   "patient_id":patientId,
+  //   "analysis_status":"Active",
+  //   "source_of_data": "PDF",
+  //   "is_abnormal": false,
+  //   "patient_age_at_record": demographicsFormData.age,
+  //   "patient_analysis_report":reports,
+  // });
+
+  const [reports, setReports] = useState([]); // Array of File objects
+  const [filesMeta, setFilesMeta] = useState({
+    analysis_status: "Active",
+    source_of_data: "PDF",
+    is_abnormal: false,
+  });
+
 
   const { t } = useTranslation();
 
@@ -96,35 +208,262 @@ const AddPatient = () => {
   };
 
   const handleDemographicsAPi = async () => {
-    const data = await demographics(demographicsFormData);
-    console.log(data);
+    console.log("Demographics API");
+    try {
+      const data = await demographics(demographicsFormData);
+      console.log("Response:", data);
+      setPatientId(data.data.id);
+    } catch (error) {
+      console.error("API Error:", error.response?.data || error.message);
+    }
+
+  //   const response = await axios.post(
+  //     'http://192.168.1.135:9380/v1/patient/patient',
+  //     demographicsFormData,
+  //     {
+  //       headers: {
+  //         Authorization: `Bearer ${token}`,
+  //         'Content-Type': 'application/json',
+  //       }
+  //     }
+  //   );
+
+  //   console.log("Response from API:", response.data);
+  // } catch (error) {
+  //   console.error("Error occurred:", error.response?.data || error.message);
+  // }
+    
   };
 
-  const navigate = useNavigate();
+
+    
+
+  const handleAnthropometricsAPi = async () => {
+    console.log("Anthropometrics API");
+    
+    try {
+      const data = await anthropometrics(anthropometricsFormData,patientId);
+      console.log("Response:", data);
+    } catch (error) {
+      console.error("API Error:", error.response?.data || error.message);
+    }
+  };
+
+  const handleCardiorespiratoryAPi = async () => {
+    console.log("Cardiorespiratory API");
+    try {
+      const data = await cardiorespiratory(cardiorespiratoryFormData,patientId);
+      console.log("Response:", data);
+    } catch (error) {
+      console.error("API Error:", error.response?.data || error.message);
+    }
+  };  
+
+  const handleNutritionAPi = async () => {
+    console.log("Nutrition API");
+    try {
+      const data = await nutrition(nutritionFormData,patientId);
+      console.log("Response:", data);
+    } catch (error) {
+      console.error("API Error:", error.response?.data || error.message);
+    }
+  };  
+
+  const handleBloodTestsAPi = async () => {
+    console.log("Blood Tests API");
+    try {
+      const data = await bloodTests(bloodTestsFormData,patientId);
+      console.log("Response:", data);
+    } catch (error) {
+      console.error("API Error:", error.response?.data || error.message);
+    }
+  };  
+
+  const handleMentalHealthAPi = async () => {
+    console.log("Mental Health API");
+    try {
+      const data = await mentalHealth(mentalHealthFormData,patientId);
+      console.log("Response:", data);
+    } catch (error) {
+      console.error("API Error:", error.response?.data || error.message);
+    }
+  };  
+
+  const handleExerciseAPi = async () => {
+    console.log("Exercise API");
+    try {
+      const data = await exercise(exerciseFormData,patientId);
+      console.log("Response:", data);
+    } catch (error) {
+      console.error("API Error:", error.response?.data || error.message);
+    }
+  };  
+
+  const handleMedicalHistoryAPi = async () => {
+    console.log("Medical History API");
+    try {
+      const data = await medicalHistory(medicalHistoryFormData,patientId);
+      console.log("Response:", data);
+    } catch (error) {
+      console.error("API Error:", error.response?.data || error.message);
+    }
+  };  
+
+  const handleGoalsAPi = async () => {
+    console.log("Goals API");
+    try {
+      const data = await goals(goalsFormData,patientId);
+      console.log("Response:", data);
+    } catch (error) {
+      console.error("API Error:", error.response?.data || error.message);
+    }
+  };  
+
+  const handleFilesAPi = async () => {
+    console.log("Reports array:", reports);
+
+  
+    const formData = new FormData();
+    formData.append("patient_id", patientId);
+    formData.append("analysis_status", filesMeta.analysis_status);
+    formData.append("source_of_data", filesMeta.source_of_data);
+    formData.append("is_abnormal", filesMeta.is_abnormal === "true" || filesMeta.is_abnormal === true);
+    formData.append("patient_age_at_record", parseInt(demographicsFormData.age));
+  
+    // Append multiple files
+    reports.forEach((report) => {
+      formData.append("patient_analysis_report", report);
+    });
+    console.log("Form data:", formData);
+  
+    try {
+      const data = await reportss(formData);
+      console.log("Response:", data);
+    } catch (error) {
+      console.error("API Error:", error.response?.data || error.message);
+    }
+  }; 
+
+  const handleAddPatientAPi = async () => {
+    console.log("Add Patient API");
+    await handleFilesAPi();
+    // await handleGoalsAPi(); // You can include other steps
+  };
+
+
+    
 
   // Demographics & Identity
   const DemographicsStep = () => (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <FloatingInput
-          label={t("full_name")}
-          value={demographicsFormData.firstName}
-          onChange={(v) => handleDemographicsInputChange("fullName", v)}
+          label={t("first_name")}
+          value={demographicsFormData.first_name}
+          onChange={(v) => handleDemographicsInputChange("first_name", v)}
+          required
+        />
+        <FloatingInput
+          label={t("last_name")}
+          value={demographicsFormData.last_name}
+          onChange={(v) => handleDemographicsInputChange("last_name", v)}
+          required
+        />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <FloatingInput
+          label={t("email")}
+          type="email"
+          value={demographicsFormData.email}
+          onChange={(v) => handleDemographicsInputChange("email", v)}
+          required
+        />
+        <FloatingInput
+          label={t("age")}
+          type="number"
+          value={demographicsFormData.age}
+          onChange={(v) => handleDemographicsInputChange("age", v)}
+          required
+        />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <SelectInput
+          label={t("gender")}
+          options={[t("male"), t("female"), t("non_binary"), t("prefer_not_to_say")]}
+          value={demographicsFormData.gender}
+          onChange={(v) => handleDemographicsInputChange("gender", v)}
+          required
         />
         <FloatingInput
           label={t("date_of_birth")}
           type="date"
           value={demographicsFormData.date_of_birth}
           onChange={(v) => handleDemographicsInputChange("date_of_birth", v)}
+          required
         />
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <SelectInput
-          label={t("biological_sex")}
-          options={[t("male"), t("female"), t("other")]}
-          value={demographicsFormData.gender}
-          onChange={(v) => handleDemographicsInputChange("gender", v)}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <FloatingInput
+          label={t("phone")}
+          type="tel"
+          value={demographicsFormData.phone}
+          onChange={(v) => handleDemographicsInputChange("phone", v)}
+          required
         />
+        <FloatingInput
+          label={t("alternative_phone")}
+          type="tel"
+          value={demographicsFormData.alternative_phone}
+          onChange={(v) => handleDemographicsInputChange("alternative_phone", v)}
+          required
+        />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <FloatingInput
+          label={t("address")}
+          value={demographicsFormData.address}
+          onChange={(v) => handleDemographicsInputChange("address", v)}
+          required
+        />
+        <FloatingInput
+          label={t("state")}
+          value={demographicsFormData.state}
+          onChange={(v) => handleDemographicsInputChange("state", v)}
+          required
+        />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <FloatingInput
+          label={t("country")}
+          value={demographicsFormData.country}
+          onChange={(v) => handleDemographicsInputChange("country", v)}
+          required
+        />
+        <FloatingInput
+          label={t("zip_code")}
+          type="number"
+          value={demographicsFormData.zip_code}
+          onChange={(v) => handleDemographicsInputChange("zip_code", v)}
+          required
+        />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <SelectInput
+          label={t("status")}
+          options={[t("active"), t("inactive")]}
+          value={demographicsFormData.status}
+          onChange={(v) => handleDemographicsInputChange("status", v)}
+          required
+        />
+        <SelectInput
+          label={t("assigned_doctor_id")}
+          options={["doctor_123", "doctor_456"]}
+          value={demographicsFormData.assigned_doctor_id}
+          onChange={(v) => handleDemographicsInputChange("assigned_doctor_id", v)}
+          required
+        />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <SelectInput
           label={t("gender_identity")}
           options={[
@@ -137,6 +476,7 @@ const AddPatient = () => {
           ]}
           value={demographicsFormData.gender_identity}
           onChange={(v) => handleDemographicsInputChange("gender_identity", v)}
+          required
         />
         <SelectInput
           label={t("ethnicity")}
@@ -153,6 +493,7 @@ const AddPatient = () => {
           ]}
           value={demographicsFormData.ethnicity}
           onChange={(v) => handleDemographicsInputChange("ethnicity", v)}
+          required
         />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -162,11 +503,22 @@ const AddPatient = () => {
           onChange={(v) =>
             handleDemographicsInputChange("country_of_residence", v)
           }
+          required
         />
         <FloatingInput
           label={t("occupation")}
           value={demographicsFormData.occupation}
           onChange={(v) => handleDemographicsInputChange("occupation", v)}
+          required
+        />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <FloatingInput
+          label={t("created_by")}
+          type="text"
+          value={demographicsFormData.created_by}
+          onChange={(v) => handleDemographicsInputChange("created_by", v)}
+          required
         />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
@@ -186,6 +538,7 @@ const AddPatient = () => {
           onChange={(v) =>
             handleDemographicsInputChange("socioeconomic_indicator", v)
           }
+          required
         />
       </div>
     </div>
@@ -200,19 +553,21 @@ const AddPatient = () => {
           type="number"
           value={anthropometricsFormData.weight_kg}
           onChange={(v) => handleAnthropometricsInputChange("weight_kg", v)}
+          required
         />
         <FloatingInput
           label={t("height_cm")}
           type="number"
           value={anthropometricsFormData.height_cm}
           onChange={(v) => handleAnthropometricsInputChange("height_cm", v)}
+          required
         />
         <FloatingInput
-          label={t("bmi_auto_calculated")}
+          label={t("bmi")}
           type="number"
           value={anthropometricsFormData.bmi}
-          disabled
           onChange={(v) => handleAnthropometricsInputChange("bmi", v)}
+          required
         />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -223,6 +578,7 @@ const AddPatient = () => {
           onChange={(v) =>
             handleAnthropometricsInputChange("waist_circumference_cm", v)
           }
+          required
         />
         <FloatingInput
           label={t("hip_circumference_cm")}
@@ -231,36 +587,36 @@ const AddPatient = () => {
           onChange={(v) =>
             handleAnthropometricsInputChange("hip_circumference_cm", v)
           }
+          required
         />
         <FloatingInput
-          label={t("waist_hip_ratio_calculated")}
+          label={t("waist_to_hip_ratio")}
           type="number"
           value={anthropometricsFormData.waist_to_hip_ratio}
-          disabled
           onChange={(v) =>
             handleAnthropometricsInputChange("waist_to_hip_ratio", v)
           }
+          required
         />
       </div>
-      <h3 className="text-lg font-medium text-gray-700 mt-6 mb-3">
-        {t("bioimpedance_metrics")}
-      </h3>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <FloatingInput
-          label={t("body_fat_percentage")}
+          label={t("body_fat_percent")}
           type="number"
           value={anthropometricsFormData.body_fat_percent}
           onChange={(v) =>
             handleAnthropometricsInputChange("body_fat_percent", v)
           }
+          required
         />
         <FloatingInput
-          label={t("muscle_mass_percentage")}
+          label={t("muscle_mass_percent")}
           type="number"
           value={anthropometricsFormData.muscle_mass_percent}
           onChange={(v) =>
             handleAnthropometricsInputChange("muscle_mass_percent", v)
           }
+          required
         />
         <FloatingInput
           label={t("visceral_fat_level")}
@@ -269,6 +625,7 @@ const AddPatient = () => {
           onChange={(v) =>
             handleAnthropometricsInputChange("visceral_fat_level", v)
           }
+          required
         />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -276,7 +633,10 @@ const AddPatient = () => {
           label={t("bone_mass")}
           type="number"
           value={anthropometricsFormData.bone_mass}
-          onChange={(v) => handleAnthropometricsInputChange("bone_mass", v)}
+          onChange={(v) =>
+            handleAnthropometricsInputChange("bone_mass", v)
+          }
+          required
         />
         <FloatingInput
           label={t("hydration_status")}
@@ -285,6 +645,7 @@ const AddPatient = () => {
           onChange={(v) =>
             handleAnthropometricsInputChange("hydration_status", v)
           }
+          required
         />
       </div>
     </div>
@@ -297,7 +658,7 @@ const AddPatient = () => {
         <FloatingInput
           label={t("resting_heart_rate")}
           type="number"
-          value={cardiorespiratoryFormData.resting_heart_rate_bpm}
+          value={cardiorespiratoryFormData.resting_heart_rate_bpm || 0}
           onChange={(v) =>
             handleCardiorespiratoryInputChange("resting_heart_rate_bpm", v)
           }
@@ -305,7 +666,7 @@ const AddPatient = () => {
         <FloatingInput
           label={t("blood_pressure_systolic")}
           type="number"
-          value={cardiorespiratoryFormData.blood_pressure_systolic}
+          value={cardiorespiratoryFormData.blood_pressure_systolic || 0}
           onChange={(v) =>
             handleCardiorespiratoryInputChange("blood_pressure_systolic", v)
           }
@@ -313,7 +674,7 @@ const AddPatient = () => {
         <FloatingInput
           label={t("blood_pressure_diastolic")}
           type="number"
-          value={cardiorespiratoryFormData.blood_pressure_diastolic}
+          value={cardiorespiratoryFormData.blood_pressure_diastolic || 0}
           onChange={(v) =>
             handleCardiorespiratoryInputChange("blood_pressure_diastolic", v)
           }
@@ -323,13 +684,13 @@ const AddPatient = () => {
         <FloatingInput
           label={t("vo2_max")}
           type="number"
-          value={cardiorespiratoryFormData.vo2_max}
+          value={cardiorespiratoryFormData.vo2_max || 0}
           onChange={(v) => handleCardiorespiratoryInputChange("vo2_max", v)}
         />
         <FloatingInput
           label={t("oxygen_saturation")}
           type="number"
-          value={cardiorespiratoryFormData.oxygen_saturation_spo2}
+          value={cardiorespiratoryFormData.oxygen_saturation_spo2 || 0}
           onChange={(v) =>
             handleCardiorespiratoryInputChange("oxygen_saturation_spo2", v)
           }
@@ -337,7 +698,7 @@ const AddPatient = () => {
         <FloatingInput
           label={t("heart_rate_variability")}
           type="number"
-          value={cardiorespiratoryFormData.heart_rate_variability_hrv}
+          value={cardiorespiratoryFormData.heart_rate_variability_hrv || 0}
           onChange={(v) =>
             handleCardiorespiratoryInputChange("heart_rate_variability_hrv", v)
           }
@@ -357,6 +718,7 @@ const AddPatient = () => {
           onChange={(v) =>
             handleNutritionInputChange("meals_prepared_at_home_per_week", v)
           }
+          required
         />
         <FloatingInput
           label={t("daily_fruits_vegetables")}
@@ -365,6 +727,7 @@ const AddPatient = () => {
           onChange={(v) =>
             handleNutritionInputChange("daily_servings_fruits_vegetables", v)
           }
+          required
         />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -378,6 +741,7 @@ const AddPatient = () => {
               v
             )
           }
+          required
         />
         <FloatingInput
           label={t("water_intake_daily")}
@@ -386,6 +750,7 @@ const AddPatient = () => {
           onChange={(v) =>
             handleNutritionInputChange("water_intake_liters_per_day", v)
           }
+          required
         />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -396,6 +761,7 @@ const AddPatient = () => {
           onChange={(v) =>
             handleNutritionInputChange("alcohol_intake_drinks_per_week", v)
           }
+          required
         />
         <FloatingInput
           label={t("vitamin_d_level")}
@@ -404,6 +770,7 @@ const AddPatient = () => {
           onChange={(v) =>
             handleNutritionInputChange("vitamin_d_blood_level", v)
           }
+          required
         />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -413,11 +780,13 @@ const AddPatient = () => {
           onChange={(v) =>
             handleNutritionInputChange("food_allergies_intolerances", v)
           }
+          required
         />
         <FloatingInput
           label={t("food_dislikes")}
           value={nutritionFormData.dislikes}
           onChange={(v) => handleNutritionInputChange("dislikes", v)}
+          required
         />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
@@ -437,6 +806,7 @@ const AddPatient = () => {
           ]}
           value={nutritionFormData.special_diet}
           onChange={(v) => handleNutritionInputChange("special_diet", v)}
+          required
         />
       </div>
     </div>
@@ -447,74 +817,331 @@ const AddPatient = () => {
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <FloatingInput
+          label={t("test_date")}
+          type="date"
+          value={bloodTestsFormData.test_date}
+          onChange={(v) => handleBloodTestsInputChange("test_date", v)}
+          required
+        />
+        <FloatingInput
           label={t("fasting_glucose")}
           type="number"
-          value={bloodTestsFormData.fasting_glucose}
+          value={bloodTestsFormData.fasting_glucose || 0}
           onChange={(v) => handleBloodTestsInputChange("fasting_glucose", v)}
+          required
         />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <FloatingInput
           label={t("hba1c")}
           type="number"
           step="0.1"
-          value={bloodTestsFormData.hba1c}
+          value={bloodTestsFormData.hba1c || 0}
           onChange={(v) => handleBloodTestsInputChange("hba1c", v)}
+          required
         />
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <FloatingInput
           label={t("total_cholesterol")}
           type="number"
-          value={bloodTestsFormData.total_cholesterol}
+          value={bloodTestsFormData.total_cholesterol || 0}
           onChange={(v) => handleBloodTestsInputChange("total_cholesterol", v)}
-        />
-        <FloatingInput
-          label={t("hdl_cholesterol")}
-          type="number"
-          value={bloodTestsFormData.hdl_cholesterol}
-          onChange={(v) => handleBloodTestsInputChange("hdl_cholesterol", v)}
+          required
         />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <FloatingInput
-          label={t("ldl_cholesterol")}
+          label={t("ldl")}
           type="number"
-          value={bloodTestsFormData.ldl_cholesterol}
-          onChange={(v) => handleBloodTestsInputChange("ldl_cholesterol", v)}
+          value={bloodTestsFormData.ldl || 0}
+          onChange={(v) => handleBloodTestsInputChange("ldl", v)}
+          required
         />
+        <FloatingInput
+          label={t("hdl")}
+          type="number"
+          value={bloodTestsFormData.hdl || 0}
+          onChange={(v) => handleBloodTestsInputChange("hdl", v)}
+          required
+        />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <FloatingInput
           label={t("triglycerides")}
           type="number"
-          value={bloodTestsFormData.triglycerides}
+          value={bloodTestsFormData.triglycerides || 0}
           onChange={(v) => handleBloodTestsInputChange("triglycerides", v)}
+          required
+        />
+        <FloatingInput
+          label={t("creatinine")}
+          type="number"
+          value={bloodTestsFormData.creatinine || 0}
+          onChange={(v) => handleBloodTestsInputChange("creatinine", v)}
+          required
         />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <FloatingInput
-          label={t("crp_level")}
+          label={t("alt")}
           type="number"
-          step="0.1"
-          value={bloodTestsFormData.crp_level}
-          onChange={(v) => handleBloodTestsInputChange("crp_level", v)}
+          value={bloodTestsFormData.alt || 0}
+          onChange={(v) => handleBloodTestsInputChange("alt", v)}
+          required
         />
         <FloatingInput
-          label={t("vitamin_d")}
+          label={t("ast")}
           type="number"
-          value={bloodTestsFormData.vitamin_d}
-          onChange={(v) => handleBloodTestsInputChange("vitamin_d", v)}
+          value={bloodTestsFormData.ast || 0}
+          onChange={(v) => handleBloodTestsInputChange("ast", v)}
+          required
         />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <FloatingInput
-          label={t("iron_level")}
+          label={t("ggt")}
           type="number"
-          value={bloodTestsFormData.iron_level}
-          onChange={(v) => handleBloodTestsInputChange("iron_level", v)}
+          value={bloodTestsFormData.ggt || 0}
+          onChange={(v) => handleBloodTestsInputChange("ggt", v)}
+          required
         />
+        <FloatingInput
+          label={t("uric_acid")}
+          type="number"
+          value={bloodTestsFormData.uric_acid || 0}
+          onChange={(v) => handleBloodTestsInputChange("uric_acid", v)}
+          required
+        />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <FloatingInput
           label={t("ferritin")}
           type="number"
-          value={bloodTestsFormData.ferritin}
+          value={bloodTestsFormData.ferritin || 0}
           onChange={(v) => handleBloodTestsInputChange("ferritin", v)}
+          required
+        />
+        <FloatingInput
+          label={t("vitamin_b12")}
+          type="number"
+          value={bloodTestsFormData.vitamin_b12 || 0}
+          onChange={(v) => handleBloodTestsInputChange("vitamin_b12", v)}
+          required
+        />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <FloatingInput
+          label={t("apoa1")}
+          type="number"
+          value={bloodTestsFormData.apoa1 || 0}
+          onChange={(v) => handleBloodTestsInputChange("apoa1", v)}
+          required
+        />
+        <FloatingInput
+          label={t("apob")}
+          type="number"
+          value={bloodTestsFormData.apob || 0}
+          onChange={(v) => handleBloodTestsInputChange("apob", v)}
+          required
+        />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <FloatingInput
+          label={t("lipoprotein_a")}
+          type="number"
+          value={bloodTestsFormData.lipoprotein_a || 0}
+          onChange={(v) => handleBloodTestsInputChange("lipoprotein_a", v)}
+          required
+        />
+        <FloatingInput
+          label={t("small_dense_ldl")}
+          type="number"
+          value={bloodTestsFormData.small_dense_ldl || 0}
+          onChange={(v) => handleBloodTestsInputChange("small_dense_ldl", v)}
+          required
+        />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <FloatingInput
+          label={t("hs_crp")}
+          type="number"
+          value={bloodTestsFormData.hs_crp || 0}
+          onChange={(v) => handleBloodTestsInputChange("hs_crp", v)}
+          required
+        />
+        <FloatingInput
+          label={t("homocysteine")}
+          type="number"
+          value={bloodTestsFormData.homocysteine || 0}
+          onChange={(v) => handleBloodTestsInputChange("homocysteine", v)}
+          required
+        />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <FloatingInput
+          label={t("fasting_insulin")}
+          type="number"
+          value={bloodTestsFormData.fasting_insulin || 0}
+          onChange={(v) => handleBloodTestsInputChange("fasting_insulin", v)}
+          required
+        />
+        <FloatingInput
+          label={t("homa_ir")}
+          type="number"
+          value={bloodTestsFormData.homa_ir || 0}
+          onChange={(v) => handleBloodTestsInputChange("homa_ir", v)}
+          required
+        />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <FloatingInput
+          label={t("c_peptide")}
+          type="number"
+          value={bloodTestsFormData.c_peptide || 0}
+          onChange={(v) => handleBloodTestsInputChange("c_peptide", v)}
+          required
+        />
+        <FloatingInput
+          label={t("adiponectin")}
+          type="number"
+          value={bloodTestsFormData.adiponectin || 0}
+          onChange={(v) => handleBloodTestsInputChange("adiponectin", v)}
+          required
+        />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <FloatingInput
+          label={t("omega_3_index")}
+          type="number"
+          value={bloodTestsFormData.omega_3_index || 0}
+          onChange={(v) => handleBloodTestsInputChange("omega_3_index", v)}
+          required
+        />
+      </div>
+      {/* Blood Tests & Biomarkers */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <FloatingInput
+          label={t("galectin_3")}
+          type="number"
+          value={bloodTestsFormData.galectin_3 || 0}
+          onChange={(v) => handleBloodTestsInputChange("galectin_3", v)}
+          required
+        />
+        <FloatingInput
+          label={t("testosterone_total")}
+          type="number"
+          value={bloodTestsFormData.testosterone_total || 0}
+          onChange={(v) => handleBloodTestsInputChange("testosterone_total", v)}
+          required
+        />
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <FloatingInput
+          label={t("testosterone_free")}
+          type="number"
+          value={bloodTestsFormData.testosterone_free || 0}
+          onChange={(v) => handleBloodTestsInputChange("testosterone_free", v)}
+          required
+        />
+        <FloatingInput
+          label={t("estradiol")}
+          type="number"
+          value={bloodTestsFormData.estradiol || 0}
+          onChange={(v) => handleBloodTestsInputChange("estradiol", v)}
+          required
+        />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <FloatingInput
+          label={t("dhea_s")}
+          type="number"
+          value={bloodTestsFormData.dhea_s || 0}
+          onChange={(v) => handleBloodTestsInputChange("dhea_s", v)}
+          required
+        />
+        <FloatingInput
+          label={t("cortisol")}
+          type="number"
+          value={bloodTestsFormData.cortisol || 0}
+          onChange={(v) => handleBloodTestsInputChange("cortisol", v)}
+          required
+        />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <FloatingInput
+          label={t("igf_1")}
+          type="number"
+          value={bloodTestsFormData.igf_1 || 0}
+          onChange={(v) => handleBloodTestsInputChange("igf_1", v)}
+          required
+        />
+        <FloatingInput
+          label={t("tsh")}
+          type="number"
+          value={bloodTestsFormData.tsh || 0}
+          onChange={(v) => handleBloodTestsInputChange("tsh", v)}
+          required
+        />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <FloatingInput
+          label={t("free_t3")}
+          type="number"
+          value={bloodTestsFormData.free_t3 || 0}
+          onChange={(v) => handleBloodTestsInputChange("free_t3", v)}
+          required
+        />
+        <FloatingInput
+          label={t("free_t4")}
+          type="number"
+          value={bloodTestsFormData.free_t4 || 0}
+          onChange={(v) => handleBloodTestsInputChange("free_t4", v)}
+          required
+        />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <FloatingInput
+          label={t("parathyroid_hormone_pth")}
+          type="number"
+          value={bloodTestsFormData.parathyroid_hormone_pth || 0}
+          onChange={(v) =>
+            handleBloodTestsInputChange("parathyroid_hormone_pth", v)
+          }
+          required
+        />
+        <FloatingInput
+          label={t("vitamin_k2")}
+          type="number"
+          value={bloodTestsFormData.vitamin_k2 || 0}
+          onChange={(v) => handleBloodTestsInputChange("vitamin_k2", v)}
+          required
+        />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <FloatingInput
+          label={t("fecal_calprotectin")}
+          type="number"
+          value={bloodTestsFormData.fecal_calprotectin || 0}
+          onChange={(v) => handleBloodTestsInputChange("fecal_calprotectin", v)}
+          required
+        />
+        <FloatingInput
+          label={t("zonulin")}
+          type="number"
+          value={bloodTestsFormData.zonulin || 0}
+          onChange={(v) => handleBloodTestsInputChange("zonulin", v)}
+          required
+        />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <FloatingInput
+          label={t("stool_microbiome_profile")}
+          type="number"
+          value={bloodTestsFormData.stool_microbiome_profile || 0}
+          onChange={(v) =>
+            handleBloodTestsInputChange("stool_microbiome_profile", v)
+          }
+          required
         />
       </div>
     </div>
@@ -529,6 +1156,7 @@ const AddPatient = () => {
           options={[t("never"), t("former"), t("current")]}
           value={mentalHealthFormData.smoker_status}
           onChange={(v) => handleMentalHealthInputChange("smoker_status", v)}
+          required
         />
         <SelectInput
           label={t("recreational_drug_use")}
@@ -542,6 +1170,7 @@ const AddPatient = () => {
           onChange={(v) =>
             handleMentalHealthInputChange("recreational_drug_use", v)
           }
+          required
         />
         <FloatingInput
           label={t("sleep_quality")}
@@ -552,6 +1181,7 @@ const AddPatient = () => {
           onChange={(v) =>
             handleMentalHealthInputChange("sleep_quality_scale", v)
           }
+          required
         />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -562,6 +1192,7 @@ const AddPatient = () => {
           onChange={(v) =>
             handleMentalHealthInputChange("sleep_hours_weekday_average", v)
           }
+          required
         />
         <FloatingInput
           label={t("sleep_hours_weekend")}
@@ -570,6 +1201,7 @@ const AddPatient = () => {
           onChange={(v) =>
             handleMentalHealthInputChange("sleep_hours_weekend_average", v)
           }
+          required
         />
         <FloatingInput
           label={t("screen_time_before_bed")}
@@ -578,6 +1210,7 @@ const AddPatient = () => {
           onChange={(v) =>
             handleMentalHealthInputChange("screen_time_before_bed", v)
           }
+          required
         />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -590,6 +1223,7 @@ const AddPatient = () => {
           onChange={(v) =>
             handleMentalHealthInputChange("stress_level_scale", v)
           }
+          required
         />
         <FloatingInput
           label={t("mood_level")}
@@ -598,6 +1232,7 @@ const AddPatient = () => {
           max="10"
           value={mentalHealthFormData.mood_scale}
           onChange={(v) => handleMentalHealthInputChange("mood_scale", v)}
+          required
         />
         <FloatingInput
           label={t("energy_level")}
@@ -608,6 +1243,7 @@ const AddPatient = () => {
           onChange={(v) =>
             handleMentalHealthInputChange("energy_level_scale", v)
           }
+          required
         />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
@@ -624,6 +1260,7 @@ const AddPatient = () => {
           onChange={(v) =>
             handleMentalHealthInputChange("history_anxiety_depression", v)
           }
+          required
         />
       </div>
     </div>
@@ -640,6 +1277,7 @@ const AddPatient = () => {
           onChange={(v) =>
             handleExerciseInputChange("weekly_exercise_frequency", v)
           }
+          required
         />
         <SelectInput
           label={t("exercise_type")}
@@ -653,6 +1291,7 @@ const AddPatient = () => {
           ]}
           value={exerciseFormData.weekly_exercise_type}
           onChange={(v) => handleExerciseInputChange("weekly_exercise_type", v)}
+          required
         />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -663,6 +1302,7 @@ const AddPatient = () => {
           onChange={(v) =>
             handleExerciseInputChange("weekly_exercise_intensity", v)
           }
+          required
         />
         <FloatingInput
           label={t("steps_per_day")}
@@ -671,6 +1311,7 @@ const AddPatient = () => {
           onChange={(v) =>
             handleExerciseInputChange("steps_per_day_average", v)
           }
+          required
         />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -681,11 +1322,13 @@ const AddPatient = () => {
           onChange={(v) =>
             handleExerciseInputChange("sedentary_hours_per_day", v)
           }
+          required
         />
         <FloatingInput
           label={t("mobility_limitations")}
           value={exerciseFormData.mobility_limitations}
           onChange={(v) => handleExerciseInputChange("mobility_limitations", v)}
+          required
         />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
@@ -695,6 +1338,7 @@ const AddPatient = () => {
           onChange={(v) =>
             handleExerciseInputChange("type_of_activity_tracker", v)
           }
+          required
         />
       </div>
     </div>
@@ -711,11 +1355,13 @@ const AddPatient = () => {
             handleMedicalHistoryInputChange("known_medical_conditions", v)
           }
           placeholder={t("diabetes_hypertension_cvd")}
+          required
         />
         <FloatingTextarea
           label={t("medications")}
           value={medicalHistoryFormData.medications}
           onChange={(v) => handleMedicalHistoryInputChange("medications", v)}
+          required
         />
       </div>
       <div className="space-y-4">
@@ -725,11 +1371,13 @@ const AddPatient = () => {
           onChange={(v) =>
             handleMedicalHistoryInputChange("supplement_usage", v)
           }
+          required
         />
         <FloatingTextarea
           label={t("allergies")}
           value={medicalHistoryFormData.allergies}
           onChange={(v) => handleMedicalHistoryInputChange("allergies", v)}
+          required
         />
       </div>
 
@@ -749,6 +1397,7 @@ const AddPatient = () => {
           onChange={(v) =>
             handleMedicalHistoryInputChange("family_history_type2_diabetes", v)
           }
+          required
         />
         <SelectInput
           label={t("cardiovascular_disease")}
@@ -765,6 +1414,7 @@ const AddPatient = () => {
               v
             )
           }
+          required
         />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -774,6 +1424,7 @@ const AddPatient = () => {
           onChange={(v) =>
             handleMedicalHistoryInputChange("family_history_cancer_type", v)
           }
+          required
         />
         <SelectInput
           label={t("alzheimers_or_parkinsons")}
@@ -790,20 +1441,24 @@ const AddPatient = () => {
               v
             )
           }
+          required
         />
       </div>
     </div>
   );
 
-  // Goals & Motivation
-  const GoalsStep = () => {
-    const handleFileUpload = (e) => {
-      const uploadedFiles = Array.from(e.target.files);
-      setFiles((prev) => [...prev, ...uploadedFiles]);
-    };
+  const handleReportUpload = (e) => {
+    const uploadedFiles = Array.from(e.target.files);
+    setReports((prev) => [...prev, ...uploadedFiles]);
+  };
 
+  // Goals & Motivation
+  
+
+  const GoalsStep = () => {
     return (
       <div className="space-y-6">
+        {/* Primary Goal */}
         <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
           <SelectInput
             label={t("primary_health_goals")}
@@ -822,7 +1477,7 @@ const AddPatient = () => {
             onChange={(v) => handleGoalsInputChange("primaryGoal", v)}
           />
         </div>
-
+  
         {/* File Upload Section */}
         <div className="mt-6">
           <h3 className="text-lg font-medium text-gray-700 mb-4">
@@ -845,30 +1500,32 @@ const AddPatient = () => {
                 className="hidden"
                 multiple
                 accept=".pdf,.jpg,.jpeg,.png"
-                onChange={handleFileUpload}
+                onChange={handleReportUpload}
               />
             </label>
           </div>
-
+  
           {/* File List */}
-          {files.length > 0 && (
+          {reports.length > 0 && (
             <div className="mt-4">
               <h4 className="text-sm font-medium text-gray-700 mb-2">
                 {t("uploaded_files")}:
               </h4>
               <div className="space-y-2">
-                {files.map((file, index) => (
+                {reports.map((report, index) => (
                   <div
                     key={index}
                     className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
                   >
                     <div className="flex items-center">
                       <FileText className="w-5 h-5 text-gray-500 mr-2" />
-                      <span className="text-sm text-gray-600">{file.name}</span>
+                      <span className="text-sm text-gray-600">
+                        {report.name}
+                      </span>
                     </div>
                     <button
                       onClick={() =>
-                        setFiles(files.filter((_, i) => i !== index))
+                        setReports((prev) => prev.filter((_, i) => i !== index))
                       }
                       className="text-red-500 hover:text-red-700"
                     >
@@ -880,7 +1537,8 @@ const AddPatient = () => {
             </div>
           )}
         </div>
-
+  
+        {/* Goals Inputs */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <SelectInput
             label={t("preferred_intervention_focus")}
@@ -904,7 +1562,7 @@ const AddPatient = () => {
             onChange={(v) => handleGoalsInputChange("motivationLevel", v)}
           />
         </div>
-
+  
         <div className="space-y-4">
           <FloatingTextarea
             label={t("barriers_to_change")}
@@ -913,7 +1571,8 @@ const AddPatient = () => {
             placeholder={t("barriers_placeholder")}
           />
         </div>
-
+  
+        {/* Wearables */}
         <h3 className="text-lg font-medium text-gray-700 mt-6 mb-3">
           {t("digital_behavioral_inputs")}
         </h3>
@@ -947,10 +1606,19 @@ const AddPatient = () => {
       </div>
     );
   };
+  
+  
+  // === SUBMIT BUTTON ===
+  <div className="flex space-x-3">
+    <button
+      className="px-8 py-3 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 transition-colors duration-200"
+      onClick={handleAddPatientAPi}
+    >
+      {t("add")}
+    </button>
+  </div>
 
-  const handleAddPatient = () => {
-    console.log(formData);
-  };
+
 
   const stepComponents = [
     DemographicsStep,
@@ -1051,6 +1719,20 @@ const AddPatient = () => {
                   onClick={async () => {
                     if (activeStep === 0) {
                       await handleDemographicsAPi();
+                    }if(activeStep === 1){
+                      await handleAnthropometricsAPi();
+                    }if(activeStep === 2){
+                      await handleCardiorespiratoryAPi();
+                    }if(activeStep === 3){
+                      await handleNutritionAPi();
+                    }if(activeStep === 4){
+                      await handleBloodTestsAPi();
+                    }if(activeStep === 5){
+                      await handleMentalHealthAPi();
+                    }if(activeStep === 6){
+                      await handleExerciseAPi();
+                    }if(activeStep === 7){
+                      await handleMedicalHistoryAPi();
                     }
                     setActiveStep(Math.min(steps.length - 1, activeStep + 1));
                   }}
@@ -1063,7 +1745,7 @@ const AddPatient = () => {
                 <div className="flex space-x-3">
                   <button
                     className="px-8 py-3 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 transition-colors duration-200"
-                    onClick={handleAddPatient}
+                    onClick={handleAddPatientAPi}
                   >
                     {t("add")}
                   </button>

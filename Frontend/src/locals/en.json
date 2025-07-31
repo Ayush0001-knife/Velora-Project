@@ -353,7 +353,9 @@
   "variables": "Variables",
   "prompt_configuration": "Prompt Configuration",
   "system_prompt_description": "This defines the AI's role, personality, and general behavior for report generation.",
-  "add_variable": "Add Variable"
+  "add_variable": "Add Variable",
+  "first_name": "First Name",
+  "last_name": "Last Name"
 
 
 

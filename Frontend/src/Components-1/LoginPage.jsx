@@ -3,13 +3,13 @@
 import React, { useRef, useState } from "react";
 import { FaEye } from "react-icons/fa";
 import { IoMdEyeOff } from "react-icons/io";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Notification from "../Components2/code/Notification";
 import { Label } from "../Components2/ui/label";
 import { Input } from "../Components2/ui/input";
 import { cn } from "../lib/utils";
 import ColourfulText from "../Components2/ui/colourful-text";
-import { loginUser } from "../services/api"; // Adjust path if different
+import { userLogin } from "../services/api"; // Adjust path if different
 import { rsaEncryptPassword } from "../lib/passEncryption"; // Adjust path if different
 
 export default function LoginPage() {
@@ -27,10 +27,10 @@ export default function LoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     const email = emailElement.current.value;
     const password = passwordElement.current.value;
-
+  
     if (!email || !password) {
       setMessage("Email and Password are required fields");
       setBgColor("#FF2400");
@@ -38,7 +38,7 @@ export default function LoginPage() {
       setShowNotification(true);
       return;
     }
-
+  
     if (email.length < 5 || password.length < 5) {
       setMessage("Email and Password must be at least 5 characters");
       setBgColor("#FF2400");
@@ -46,33 +46,40 @@ export default function LoginPage() {
       setShowNotification(true);
       return;
     }
-
+  
     const encryptedPassword = rsaEncryptPassword(password);
-
-    console.log(encryptedPassword, email);
-
+    console.log("Encrypted:", encryptedPassword, "Email:", email);
+  
     try {
-      const data = await loginUser({ email, password: encryptedPassword });
-
-      // Assuming token comes from `data.token` (adjust if different)
-      localStorage.setItem("access_token", data.token);
-      console.log("Data", data);
-
+      const data = await userLogin(email, encryptedPassword);
+  
+      // ✅ Navigate and notify on success
       setMessage("Login Successful");
       setBgColor("#088F8F");
       setDuration(3000);
       setShowNotification(true);
-
-      navigate("/home");
+  
+      setTimeout(() => {
+        navigate("/home");
+      }, 3000);
     } catch (error) {
-      const errorMsg =
-        error.response?.data?.message || "Login failed. Try again.";
+      // ✅ More robust error message handling
+      let errorMsg = "Login failed. Try again.";
+      if (error?.response?.data?.message) {
+        errorMsg = error.response.data.message;
+      } else if (error.message) {
+        errorMsg = error.message;
+      }
+  
+      console.error("Login Error:", errorMsg);
+  
       setMessage(errorMsg);
       setBgColor("#FF2400");
       setDuration(3000);
       setShowNotification(true);
     }
   };
+ 
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white  to-white relative px-4 py-12">
