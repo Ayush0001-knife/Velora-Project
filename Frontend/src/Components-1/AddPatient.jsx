@@ -17,29 +17,45 @@ import {
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { anthropometrics, bloodTests, cardiorespiratory, demographics, exercise, goals, medicalHistory, mentalHealth, nutrition, reportss } from "../services/api";
+import { anthropometrics, anthropometricsPut, bloodTests, bloodTestsPut, cardiorespiratory, cardiorespiratoryPut, demographics, demographicsPut, exercise, exercisePut, goals, medicalHistory, medicalHistoryPut, mentalHealth, mentalHealthPut, nutrition, nutritionPut, reportss } from "../services/api";
 
 const AddPatient = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [patientId, setPatientId] = useState(null);
+  const [anthropometricsId, setAnthropometricsId] = useState(null);
+  const [vitalId, setVitalId] = useState(null);
+  const [nutritionId, setNutritionId] = useState(null);
+  const [bloodTestsId, setBloodTestsId] = useState(null);
+  const [mentalHealthId, setMentalHealthId] = useState(null);
+  const [exerciseId, setExerciseId] = useState(null);
+  const [medicalHistoryId, setMedicalHistoryId] = useState(null);
+
   const [demographicsFormData, setDemographicsFormData] = useState({});
+  const [submittedDemographicsData, setSubmittedDemographicsData] = useState(null);
+
   const [anthropometricsFormData, setAnthropometricsFormData] = useState({});
+  const [submittedAnthropometricsData, setSubmittedAnthropometricsData] = useState(null);
+
   const [cardiorespiratoryFormData, setCardiorespiratoryFormData] = useState({});
+  const [submittedCardiorespiratoryData, setSubmittedCardiorespiratoryData] = useState(null);
+
   const [nutritionFormData, setNutritionFormData] = useState({ });
+  const [submittedNutritionData, setSubmittedNutritionData] = useState(null);
+
   const [bloodTestsFormData, setBloodTestsFormData] = useState({});
+  const [submittedBloodTestsData, setSubmittedBloodTestsData] = useState(null);
+
   const [mentalHealthFormData, setMentalHealthFormData] = useState({});
+  const [submittedMentalHealthData, setSubmittedMentalHealthData] = useState(null);
+
   const [exerciseFormData, setExerciseFormData] = useState({});
+  const [submittedExerciseData, setSubmittedExerciseData] = useState(null);
+
   const [medicalHistoryFormData, setMedicalHistoryFormData] = useState({});
+  const [submittedMedicalHistoryData, setSubmittedMedicalHistoryData] = useState(null);
+
   const [goalsFormData, setGoalsFormData] = useState({});
-  // const [reports,setReports] = useState([]);
-  // const [files, setFiles] = useState({
-  //   "patient_id":patientId,
-  //   "analysis_status":"Active",
-  //   "source_of_data": "PDF",
-  //   "is_abnormal": false,
-  //   "patient_age_at_record": demographicsFormData.age,
-  //   "patient_analysis_report":reports,
-  // });
+  const [submittedGoalsData, setSubmittedGoalsData] = useState(null);
 
   const [reports, setReports] = useState([]); // Array of File objects
   const [filesMeta, setFilesMeta] = useState({
@@ -101,107 +117,318 @@ const AddPatient = () => {
     setGoalsFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleDemographicsAPi = async () => {
+  const handleDemographicsApi = async () => {
     console.log("Demographics API");
+  
+    // Normalize age to an integer before comparing/sending
+    const normalizedData = {
+      ...demographicsFormData,
+      age: Number(demographicsFormData.age),
+      assigned_doctor_id: Number(demographicsFormData.assigned_doctor_id),
+      zip_code: String(demographicsFormData.zip_code),
+      // Add more conversions if needed
+    };
+  
     try {
-      const data = await demographics(demographicsFormData);
-      console.log("Response:", data);
-      setPatientId(data.data.id);
+      // First-time submission: POST
+      if (submittedDemographicsData === null) {
+        const response = await demographics(normalizedData); // POST
+        console.log("POST Response:", response.message);
+        console.log("Patient ID:",response.data.id)
+
+  
+        setPatientId(response.data.id); // Or response.data.patient_id
+        setSubmittedDemographicsData(normalizedData); // Save submitted state
+      }
+  
+      // Data has changed: PUT
+      else if (JSON.stringify(normalizedData) !== JSON.stringify(submittedDemographicsData)) {
+        console.log("PUT Data:", normalizedData);
+        console.log("PUT Patient ID:", patientId);
+        const response = await demographicsPut(normalizedData, patientId);
+
+        console.log("PUT Response:", response.data);
+  
+        setSubmittedDemographicsData(normalizedData); // Save updated state
+      }
+  
+      // No change: Skip API
+      else {
+        console.log("No changes in demographics — skipping API call.");
+      }
     } catch (error) {
-      console.error("API Error:", error.response?.data || error.message);
+      console.error("Demographics API Error:", error.response?.data || error.message);
     }
-
-  //   const response = await axios.post(
-  //     'http://192.168.1.135:9380/v1/patient/patient',
-  //     demographicsFormData,
-  //     {
-  //       headers: {
-  //         Authorization: `Bearer ${token}`,
-  //         'Content-Type': 'application/json',
-  //       }
-  //     }
-  //   );
-
-  //   console.log("Response from API:", response.data);
-  // } catch (error) {
-  //   console.error("Error occurred:", error.response?.data || error.message);
-  // }
-    
   };
-
-
-    
-
-  const handleAnthropometricsAPi = async () => {
+  
+  const handleAnthropometricsApi = async () => {
     console.log("Anthropometrics API");
-    
+  
+    const normalizedData = {
+      ...anthropometricsFormData
+      // Add more conversions if needed
+    };
+  
     try {
-      const data = await anthropometrics(anthropometricsFormData,patientId);
-      console.log("Response:", data);
+      // First-time submission: POST
+      if (submittedAnthropometricsData === null) {
+        const response = await anthropometrics(normalizedData); // POST
+        console.log("POST Response:", response.message);
+        console.log("Anthropometrics ID:",response.record.anthropometric_id)
+        setAnthropometricsId(response.record.anthropometric_id);
+  
+        setSubmittedAnthropometricsData(normalizedData); // Save submitted state
+      }
+  
+      // Data has changed: PUT
+      else if (JSON.stringify(normalizedData) !== JSON.stringify(submittedAnthropometricsData)) {
+        console.log("PUT Data:", normalizedData);
+        console.log("PUT Patient ID:", anthropometricsId);
+        const response = await anthropometricsPut(normalizedData, anthropometricsId);
+
+        console.log("PUT Response:", response.message);
+  
+        setSubmittedAnthropometricsData(normalizedData); // Save updated state
+      }
+  
+      // No change: Skip API
+      else {
+        console.log("No changes in anthropometrics — skipping API call.");
+      }
     } catch (error) {
-      console.error("API Error:", error.response?.data || error.message);
+      console.error("Anthropometrics API Error:", error.response?.data || error.message);
     }
   };
 
-  const handleCardiorespiratoryAPi = async () => {
+  const handleCardiorespiratoryApi = async () => {
     console.log("Cardiorespiratory API");
+  
+    const normalizedData = {
+      ...cardiorespiratoryFormData
+      // Add more conversions if needed
+    };
+  
     try {
-      const data = await cardiorespiratory(cardiorespiratoryFormData,patientId);
-      console.log("Response:", data);
-    } catch (error) {
-      console.error("API Error:", error.response?.data || error.message);
-    }
-  };  
+      // First-time submission: POST
+      if (submittedCardiorespiratoryData === null) {
+        const response = await cardiorespiratory(normalizedData); // POST
+        console.log("POST Response:", response.message);
+        console.log("Cardiorespiratory ID:",response.data.vital_id)
+        setVitalId(response.data.vital_id);
+  
+        setSubmittedCardiorespiratoryData(normalizedData); // Save submitted state
+      }
+  
+      // Data has changed: PUT
+      else if (JSON.stringify(normalizedData) !== JSON.stringify(submittedCardiorespiratoryData)) {
+        console.log("PUT Data:", normalizedData);
+        console.log("PUT Patient ID:", vitalId);
+        const response = await cardiorespiratoryPut(normalizedData, vitalId);
 
-  const handleNutritionAPi = async () => {
+        console.log("PUT Response:", response.message);
+  
+        setSubmittedCardiorespiratoryData(normalizedData); // Save updated state
+      }
+  
+      // No change: Skip API
+      else {
+        console.log("No changes in cardiorespiratory — skipping API call.");
+      }
+    } catch (error) {
+      console.error("Cardiorespiratory API Error:", error.response?.data || error.message);
+    }
+  };
+ 
+
+  const handleNutritionApi = async () => {
     console.log("Nutrition API");
+  
+    const normalizedData = {
+      ...nutritionFormData
+      // Add more conversions if needed
+    };
+  
     try {
-      const data = await nutrition(nutritionFormData,patientId);
-      console.log("Response:", data);
-    } catch (error) {
-      console.error("API Error:", error.response?.data || error.message);
-    }
-  };  
+      // First-time submission: POST
+      if (submittedNutritionData === null) {
+        const response = await nutrition(normalizedData); // POST
+        console.log("POST Response:", response.message);
+        console.log("Nutrition ID:",response.data.nutrition_id)
+        setNutritionId(response.data.nutrition_id);
+  
+        setSubmittedNutritionData(normalizedData); // Save submitted state
+      }
+  
+      // Data has changed: PUT
+      else if (JSON.stringify(normalizedData) !== JSON.stringify(submittedNutritionData)) {
+        console.log("PUT Data:", normalizedData);
+        const response = await nutritionPut(normalizedData, nutritionId);
 
-  const handleBloodTestsAPi = async () => {
+        console.log("PUT Response:", response.message);
+  
+        setSubmittedNutritionData(normalizedData); // Save updated state
+      }
+  
+      // No change: Skip API
+      else {
+        console.log("No changes in nutrition — skipping API call.");
+      }
+    } catch (error) {
+      console.error("Nutrition API Error:", error.response?.data || error.message);
+    }
+  };
+
+  const handleBloodTestsApi = async () => {
     console.log("Blood Tests API");
+  
+    const normalizedData = {
+      ...bloodTestsFormData
+      // Add more conversions if needed
+    };
+  
     try {
-      const data = await bloodTests(bloodTestsFormData,patientId);
-      console.log("Response:", data);
-    } catch (error) {
-      console.error("API Error:", error.response?.data || error.message);
-    }
-  };  
+      // First-time submission: POST
+      if (submittedBloodTestsData === null) {
+        const response = await bloodTests(normalizedData); // POST
+        console.log("POST Response:", response.message);
+        console.log("Blood Tests ID:",response.data.blood_tests_id)
+        setBloodTestsId(response.data.blood_tests_id);
+  
+        setSubmittedBloodTestsData(normalizedData); // Save submitted state
+      }
+  
+      // Data has changed: PUT
+      else if (JSON.stringify(normalizedData) !== JSON.stringify(submittedBloodTestsData)) {
+        console.log("PUT Data:", normalizedData);
+        const response = await bloodTestsPut(normalizedData, bloodTestsId);
 
-  const handleMentalHealthAPi = async () => {
+        console.log("PUT Response:", response.message);
+  
+        setSubmittedBloodTestsData(normalizedData); // Save updated state
+      }
+  
+      // No change: Skip API
+      else {
+        console.log("No changes in blood tests — skipping API call.");
+      }
+    } catch (error) {
+      console.error("Blood Tests API Error:", error.response?.data || error.message);
+    }
+  };
+
+  const handleMentalHealthApi = async () => {
     console.log("Mental Health API");
+  
+    const normalizedData = {
+      ...mentalHealthFormData
+      // Add more conversions if needed
+    };
+  
     try {
-      const data = await mentalHealth(mentalHealthFormData,patientId);
-      console.log("Response:", data);
-    } catch (error) {
-      console.error("API Error:", error.response?.data || error.message);
-    }
-  };  
+      // First-time submission: POST
+      if (submittedMentalHealthData === null) {
+        const response = await mentalHealth(normalizedData); // POST
+        console.log("POST Response:", response.message);
+        console.log("Mental Health ID:",response.data.mental_health_id)
+        setMentalHealthId(response.data.mental_health_id);
+  
+        setSubmittedMentalHealthData(normalizedData); // Save submitted state
+      }
+  
+      // Data has changed: PUT
+      else if (JSON.stringify(normalizedData) !== JSON.stringify(submittedMentalHealthData)) {
+        console.log("PUT Data:", normalizedData);
+        const response = await mentalHealthPut(normalizedData, mentalHealthId);
 
-  const handleExerciseAPi = async () => {
+        console.log("PUT Response:", response.message);
+  
+        setSubmittedMentalHealthData(normalizedData); // Save updated state
+      }
+  
+      // No change: Skip API
+      else {
+        console.log("No changes in mental health — skipping API call.");
+      }
+    } catch (error) {
+      console.error("Mental Health API Error:", error.response?.data || error.message);
+    }
+  };
+
+  const handleExerciseApi = async () => {
     console.log("Exercise API");
+  
+    const normalizedData = {
+      ...exerciseFormData
+      // Add more conversions if needed
+    };
+  
     try {
-      const data = await exercise(exerciseFormData,patientId);
-      console.log("Response:", data);
-    } catch (error) {
-      console.error("API Error:", error.response?.data || error.message);
-    }
-  };  
+      // First-time submission: POST
+      if (submittedExerciseData === null) {
+        const response = await exercise(normalizedData); // POST
+        console.log("POST Response:", response.message);
+        console.log("Exercise ID:",response.data.exercise_id)
+        setExerciseId(response.data.exercise_id);
+  
+        setSubmittedExerciseData(normalizedData); // Save submitted state
+      }
+  
+      // Data has changed: PUT
+      else if (JSON.stringify(normalizedData) !== JSON.stringify(submittedExerciseData)) {
+        console.log("PUT Data:", normalizedData);
+        const response = await exercisePut(normalizedData, exerciseId);
 
-  const handleMedicalHistoryAPi = async () => {
-    console.log("Medical History API");
-    try {
-      const data = await medicalHistory(medicalHistoryFormData,patientId);
-      console.log("Response:", data);
+        console.log("PUT Response:", response.message);
+  
+        setSubmittedExerciseData(normalizedData); // Save updated state
+      }
+  
+      // No change: Skip API
+      else {
+        console.log("No changes in exercise — skipping API call.");
+      }
     } catch (error) {
-      console.error("API Error:", error.response?.data || error.message);
+      console.error("Exercise API Error:", error.response?.data || error.message);
     }
-  };  
+  };
+
+  const handleMedicalHistoryApi = async () => {
+    console.log("Medical History API");
+  
+    const normalizedData = {
+      ...medicalHistoryFormData
+      // Add more conversions if needed
+    };
+  
+    try {
+      // First-time submission: POST
+      if (submittedMedicalHistoryData === null) {
+        const response = await medicalHistory(normalizedData); // POST
+        console.log("POST Response:", response.message);
+        console.log("Medical History ID:",response.data.medical_history_id)
+        setMedicalHistoryId(response.data.medical_history_id);
+  
+        setSubmittedMedicalHistoryData(normalizedData); // Save submitted state
+      }
+  
+      // Data has changed: PUT
+      else if (JSON.stringify(normalizedData) !== JSON.stringify(submittedMedicalHistoryData)) {
+        console.log("PUT Data:", normalizedData);
+        const response = await medicalHistoryPut(normalizedData, medicalHistoryId);
+
+        console.log("PUT Response:", response.message);
+  
+        setSubmittedMedicalHistoryData(normalizedData); // Save updated state
+      }
+  
+      // No change: Skip API
+      else {
+        console.log("No changes in medical history — skipping API call.");
+      }
+    } catch (error) {
+      console.error("Exercise API Error:", error.response?.data || error.message);
+    }
+  };
 
   const handleGoalsAPi = async () => {
     console.log("Goals API");
@@ -1700,21 +1927,21 @@ const AddPatient = () => {
                 <button
                   onClick={async () => {
                     if (activeStep === 0) {
-                      await handleDemographicsAPi();
+                      await handleDemographicsApi();
                     }if(activeStep === 1){
-                      await handleAnthropometricsAPi();
+                      await handleAnthropometricsApi();
                     }if(activeStep === 2){
-                      await handleCardiorespiratoryAPi();
+                      await handleCardiorespiratoryApi();
                     }if(activeStep === 3){
-                      await handleNutritionAPi();
+                      await handleNutritionApi();
                     }if(activeStep === 4){
-                      await handleBloodTestsAPi();
+                      await handleBloodTestsApi();
                     }if(activeStep === 5){
-                      await handleMentalHealthAPi();
+                      await handleMentalHealthApi();
                     }if(activeStep === 6){
-                      await handleExerciseAPi();
+                      await handleExerciseApi();
                     }if(activeStep === 7){
-                      await handleMedicalHistoryAPi();
+                      await handleMedicalHistoryApi();
                     }
                     setActiveStep(Math.min(steps.length - 1, activeStep + 1));
                   }}

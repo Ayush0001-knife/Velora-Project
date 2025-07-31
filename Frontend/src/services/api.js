@@ -98,4 +98,50 @@ export const reportss = async (formData) => {
 };
 
 
+export const demographicsPut = async (formData,patientId) => {
+  const response = await axiosInstance.put(apiUrl.DEMOGRAPHICSPUT(patientId), formData);
+  return response.data;
+};
+
+export const anthropometricsPut = async (formData,anthropometricsId) => {
+  console.log("patientId in api request",anthropometricsId)
+  const response = await axiosInstance.put(apiUrl.ANTHROPOMETRICSPUT(anthropometricsId), formData);
+  return response.data;
+};
+
+export const cardiorespiratoryPut = async (formData,vitalId) => {
+  const response = await axiosInstance.put(apiUrl.CARDIORESPIRATORYPUT(vitalId), formData);
+  return response.data;
+};
+
+export const nutritionPut = async (formData,nutritionId) => {
+  const response = await axiosInstance.put(apiUrl.NUTRITIONPUT(nutritionId), formData);
+  return response.data;
+};
+
+export const bloodTestsPut = async (formData,bloodTestsId) => {
+  const response = await axiosInstance.put(apiUrl.BLOODTESTSPUT(bloodTestsId), formData);
+  return response.data;
+};
+
+export const mentalHealthPut = async (formData,mentalHealthId) => {
+  const response = await axiosInstance.put(apiUrl.MENTALHEALTHPUT(mentalHealthId), formData);
+  return response.data;
+};
+
+export const exercisePut = async (formData,exerciseId) => {
+  const response = await axiosInstance.put(apiUrl.EXERCISEPUT(exerciseId), formData);
+  return response.data;
+};
+
+export const medicalHistoryPut = async (formData,medicalHistoryId) => {
+  const response = await axiosInstance.put(apiUrl.MEDICALHISTORYPUT(medicalHistoryId), formData);
+  return response.data;
+};
+
+
+
+
+
+
   
