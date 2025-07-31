@@ -22,122 +22,14 @@ import { anthropometrics, bloodTests, cardiorespiratory, demographics, exercise,
 const AddPatient = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [patientId, setPatientId] = useState(null);
-  const [demographicsFormData, setDemographicsFormData] = useState({"first_name": "John",
-    "last_name": "Doe",
-    "email": "john.doe@example.com",
-    "age": 30,
-    "gender": "Male",
-    "date_of_birth": "1995-01-01",
-    "phone": "+1234567890",
-    "alternative_phone": "+0987654321",
-    "address": "123 Main St",
-    "state": "California",
-    "country": "USA",
-    "zip_code": "90001",
-    "status": "Active",
-    "created_by": "admin",
-    "assigned_doctor_id": "doctor_123",
-    "gender_identity": "Non-binary",
-    "ethnicity": "Asian",
-    "country_of_residence": "USA",
-    "occupation": "Software Engineer",
-    "socioeconomic_indicator": "Middle Class"});
-  const [anthropometricsFormData, setAnthropometricsFormData] = useState({"weight_kg": 0,
-  "height_cm": 0,
-  "bmi": 0,
-  "waist_circumference_cm": 0,
-  "hip_circumference_cm": 0,
-  "waist_to_hip_ratio": 0,
-  "body_fat_percent": 0,
-  "muscle_mass_percent": 0,
-  "visceral_fat_level": 0,
-  "bone_mass": 0,
-  "hydration_status": 0
-});
-  const [cardiorespiratoryFormData, setCardiorespiratoryFormData] = useState({
-    "resting_heart_rate_bpm": 0,
-  "blood_pressure_systolic": 0,
-  "blood_pressure_diastolic": 0,
-  "vo2_max": 0,
-  "oxygen_saturation_spo2": 0,
-  "heart_rate_variability_hrv": 0
-});
-  const [nutritionFormData, setNutritionFormData] = useState({ "meals_prepared_at_home_per_week": 0,
-    "daily_servings_fruits_vegetables": 0,
-    "weekly_servings_ultra_processed_foods": 0,
-    "water_intake_liters_per_day":1,
-    "alcohol_intake_drinks_per_week": 0,
-    "vitamin_d_blood_level": 1,
-    "food_allergies_intolerances": "string",
-    "dislikes": "string",
-    "special_diet": "string"});
-  const [bloodTestsFormData, setBloodTestsFormData] = useState({
-    "test_date": "2025-07-31",
-    "fasting_glucose": 0,
-    "hba1c": 0,
-    "total_cholesterol": 0,
-    "ldl": 0,
-    "hdl": 0,
-    "triglycerides": 0,
-    "creatinine": 0,
-    "alt": 0,
-    "ast": 0,
-    "ggt": 0,
-    "uric_acid": 0,
-    "ferritin": 0,
-    "vitamin_b12": 0,
-    "apoa1": 0,
-    "apob": 0,
-    "lipoprotein_a": 0,
-    "small_dense_ldl": 0,
-    "hs_crp": 0,
-    "homocysteine": 0,
-    "fasting_insulin": 0,
-    "homa_ir": 0,
-    "c_peptide": 0,
-    "adiponectin": 0,
-    "omega_3_index": 0,
-    "galectin_3": 0,
-    "testosterone_total": 0,
-    "testosterone_free": 0,
-    "estradiol": 0,
-    "dhea_s": 0,
-    "cortisol": 0,
-    "igf_1": 0,
-    "tsh": 0,
-    "free_t3": 0,
-    "free_t4": 0,
-    "parathyroid_hormone_pth": 0,
-    "vitamin_k2": 0,
-    "fecal_calprotectin": 0,
-    "zonulin": 0,
-    "stool_microbiome_profile": "string"
-  });
-  const [mentalHealthFormData, setMentalHealthFormData] = useState({"smoker_status": true,
-  "recreational_drug_use": true,
-  "sleep_quality_scale": 1,
-  "sleep_hours_weekday_average": 1,
-  "sleep_hours_weekend_average": 1,
-  "screen_time_before_bed": 1,
-  "stress_level_scale": 1,
-  "mood_scale": 1,
-  "energy_level_scale": 1,
-  "history_anxiety_depression": true});
-  const [exerciseFormData, setExerciseFormData] = useState({ "weekly_exercise_frequency": 0,
-    "weekly_exercise_type": "string",
-    "weekly_exercise_intensity": "string",
-    "steps_per_day_average": 0,
-    "sedentary_hours_per_day": 0,
-    "mobility_limitations": "string",
-    "type_of_activity_tracker": "string"});
-  const [medicalHistoryFormData, setMedicalHistoryFormData] = useState({"known_medical_conditions": "string",
-  "medications": "string",
-  "supplement_usage": "string",
-  "allergies": "string",
-  "family_history_type2_diabetes": true,
-  "family_history_cardiovascular_disease": true,
-  "family_history_cancer_type": "string",
-  "family_history_alzheimers_parkinsons": true});
+  const [demographicsFormData, setDemographicsFormData] = useState({});
+  const [anthropometricsFormData, setAnthropometricsFormData] = useState({});
+  const [cardiorespiratoryFormData, setCardiorespiratoryFormData] = useState({});
+  const [nutritionFormData, setNutritionFormData] = useState({ });
+  const [bloodTestsFormData, setBloodTestsFormData] = useState({});
+  const [mentalHealthFormData, setMentalHealthFormData] = useState({});
+  const [exerciseFormData, setExerciseFormData] = useState({});
+  const [medicalHistoryFormData, setMedicalHistoryFormData] = useState({});
   const [goalsFormData, setGoalsFormData] = useState({});
   // const [reports,setReports] = useState([]);
   // const [files, setFiles] = useState({
@@ -155,6 +47,8 @@ const AddPatient = () => {
     source_of_data: "PDF",
     is_abnormal: false,
   });
+
+
 
 
   const { t } = useTranslation();
@@ -455,9 +349,9 @@ const AddPatient = () => {
           onChange={(v) => handleDemographicsInputChange("status", v)}
           required
         />
-        <SelectInput
+        <FloatingInput
           label={t("assigned_doctor_id")}
-          options={["doctor_123", "doctor_456"]}
+          type="number"
           value={demographicsFormData.assigned_doctor_id}
           onChange={(v) => handleDemographicsInputChange("assigned_doctor_id", v)}
           required
@@ -658,25 +552,28 @@ const AddPatient = () => {
         <FloatingInput
           label={t("resting_heart_rate")}
           type="number"
+          min={1}
           value={cardiorespiratoryFormData.resting_heart_rate_bpm || 0}
           onChange={(v) =>
-            handleCardiorespiratoryInputChange("resting_heart_rate_bpm", v)
+            handleCardiorespiratoryInputChange("resting_heart_rate_bpm", parseInt(v))
           }
         />
         <FloatingInput
           label={t("blood_pressure_systolic")}
           type="number"
+          min={1}
           value={cardiorespiratoryFormData.blood_pressure_systolic || 0}
           onChange={(v) =>
-            handleCardiorespiratoryInputChange("blood_pressure_systolic", v)
+            handleCardiorespiratoryInputChange("blood_pressure_systolic", parseInt(v))
           }
         />
         <FloatingInput
           label={t("blood_pressure_diastolic")}
           type="number"
+          min={1}
           value={cardiorespiratoryFormData.blood_pressure_diastolic || 0}
           onChange={(v) =>
-            handleCardiorespiratoryInputChange("blood_pressure_diastolic", v)
+            handleCardiorespiratoryInputChange("blood_pressure_diastolic", parseInt(v))
           }
         />
       </div>
@@ -684,28 +581,34 @@ const AddPatient = () => {
         <FloatingInput
           label={t("vo2_max")}
           type="number"
+          min={1}
           value={cardiorespiratoryFormData.vo2_max || 0}
-          onChange={(v) => handleCardiorespiratoryInputChange("vo2_max", v)}
+          onChange={(v) =>
+            handleCardiorespiratoryInputChange("vo2_max", parseInt(v))
+          }
         />
         <FloatingInput
           label={t("oxygen_saturation")}
           type="number"
+          min={1}
           value={cardiorespiratoryFormData.oxygen_saturation_spo2 || 0}
           onChange={(v) =>
-            handleCardiorespiratoryInputChange("oxygen_saturation_spo2", v)
+            handleCardiorespiratoryInputChange("oxygen_saturation_spo2", parseInt(v))
           }
         />
         <FloatingInput
           label={t("heart_rate_variability")}
           type="number"
+          min={1}
           value={cardiorespiratoryFormData.heart_rate_variability_hrv || 0}
           onChange={(v) =>
-            handleCardiorespiratoryInputChange("heart_rate_variability_hrv", v)
+            handleCardiorespiratoryInputChange("heart_rate_variability_hrv", parseInt(v))
           }
         />
       </div>
     </div>
   );
+  
 
   // Nutrition & Metabolic Health
   const NutritionStep = () => (
@@ -714,65 +617,71 @@ const AddPatient = () => {
         <FloatingInput
           label={t("meals_per_week_home")}
           type="number"
+          min={1}
           value={nutritionFormData.meals_prepared_at_home_per_week}
           onChange={(v) =>
-            handleNutritionInputChange("meals_prepared_at_home_per_week", v)
+            handleNutritionInputChange("meals_prepared_at_home_per_week", parseFloat(v))
           }
           required
         />
         <FloatingInput
           label={t("daily_fruits_vegetables")}
           type="number"
+          min={1}
           value={nutritionFormData.daily_servings_fruits_vegetables}
           onChange={(v) =>
-            handleNutritionInputChange("daily_servings_fruits_vegetables", v)
+            handleNutritionInputChange("daily_servings_fruits_vegetables", parseFloat(v))
           }
           required
         />
       </div>
+  
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <FloatingInput
           label={t("weekly_processed_foods")}
           type="number"
+          min={1}
           value={nutritionFormData.weekly_servings_ultra_processed_foods}
           onChange={(v) =>
-            handleNutritionInputChange(
-              "weekly_servings_ultra_processed_foods",
-              v
-            )
+            handleNutritionInputChange("weekly_servings_ultra_processed_foods", parseFloat(v))
           }
           required
         />
         <FloatingInput
           label={t("water_intake_daily")}
           type="number"
+          min={1}
           value={nutritionFormData.water_intake_liters_per_day}
           onChange={(v) =>
-            handleNutritionInputChange("water_intake_liters_per_day", v)
+            handleNutritionInputChange("water_intake_liters_per_day", parseFloat(v))
           }
           required
         />
       </div>
+  
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <FloatingInput
           label={t("alcohol_intake_weekly")}
           type="number"
+          min={1}
           value={nutritionFormData.alcohol_intake_drinks_per_week}
           onChange={(v) =>
-            handleNutritionInputChange("alcohol_intake_drinks_per_week", v)
+            handleNutritionInputChange("alcohol_intake_drinks_per_week", parseFloat(v))
           }
           required
         />
         <FloatingInput
           label={t("vitamin_d_level")}
           type="number"
+          min={1}
           value={nutritionFormData.vitamin_d_blood_level}
           onChange={(v) =>
-            handleNutritionInputChange("vitamin_d_blood_level", v)
+            handleNutritionInputChange("vitamin_d_blood_level", parseFloat(v))
           }
           required
         />
       </div>
+  
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <FloatingInput
           label={t("food_allergies")}
@@ -789,6 +698,7 @@ const AddPatient = () => {
           required
         />
       </div>
+  
       <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
         <SelectInput
           label={t("special_diet")}
@@ -811,6 +721,7 @@ const AddPatient = () => {
       </div>
     </div>
   );
+  
 
   // Blood Tests & Biomarkers
   const BloodTestsStep = () => (
@@ -826,7 +737,8 @@ const AddPatient = () => {
         <FloatingInput
           label={t("fasting_glucose")}
           type="number"
-          value={bloodTestsFormData.fasting_glucose || 0}
+          min={1}
+          value={bloodTestsFormData.fasting_glucose}
           onChange={(v) => handleBloodTestsInputChange("fasting_glucose", v)}
           required
         />
@@ -835,15 +747,17 @@ const AddPatient = () => {
         <FloatingInput
           label={t("hba1c")}
           type="number"
+          min={1}
           step="0.1"
-          value={bloodTestsFormData.hba1c || 0}
+          value={bloodTestsFormData.hba1c}
           onChange={(v) => handleBloodTestsInputChange("hba1c", v)}
           required
         />
         <FloatingInput
           label={t("total_cholesterol")}
           type="number"
-          value={bloodTestsFormData.total_cholesterol || 0}
+          min={1}
+          value={bloodTestsFormData.total_cholesterol}
           onChange={(v) => handleBloodTestsInputChange("total_cholesterol", v)}
           required
         />
@@ -852,14 +766,16 @@ const AddPatient = () => {
         <FloatingInput
           label={t("ldl")}
           type="number"
-          value={bloodTestsFormData.ldl || 0}
+          min={1}
+          value={bloodTestsFormData.ldl}
           onChange={(v) => handleBloodTestsInputChange("ldl", v)}
           required
         />
         <FloatingInput
           label={t("hdl")}
           type="number"
-          value={bloodTestsFormData.hdl || 0}
+          min={1}
+          value={bloodTestsFormData.hdl}
           onChange={(v) => handleBloodTestsInputChange("hdl", v)}
           required
         />
@@ -868,14 +784,16 @@ const AddPatient = () => {
         <FloatingInput
           label={t("triglycerides")}
           type="number"
-          value={bloodTestsFormData.triglycerides || 0}
+          min={1}
+          value={bloodTestsFormData.triglycerides}
           onChange={(v) => handleBloodTestsInputChange("triglycerides", v)}
           required
         />
         <FloatingInput
           label={t("creatinine")}
           type="number"
-          value={bloodTestsFormData.creatinine || 0}
+          min={1}
+          value={bloodTestsFormData.creatinine}
           onChange={(v) => handleBloodTestsInputChange("creatinine", v)}
           required
         />
@@ -884,14 +802,16 @@ const AddPatient = () => {
         <FloatingInput
           label={t("alt")}
           type="number"
-          value={bloodTestsFormData.alt || 0}
+          min={1}
+          value={bloodTestsFormData.alt}
           onChange={(v) => handleBloodTestsInputChange("alt", v)}
           required
         />
         <FloatingInput
           label={t("ast")}
           type="number"
-          value={bloodTestsFormData.ast || 0}
+          min={1}
+          value={bloodTestsFormData.ast}
           onChange={(v) => handleBloodTestsInputChange("ast", v)}
           required
         />
@@ -900,14 +820,16 @@ const AddPatient = () => {
         <FloatingInput
           label={t("ggt")}
           type="number"
-          value={bloodTestsFormData.ggt || 0}
+          min={1}
+          value={bloodTestsFormData.ggt}
           onChange={(v) => handleBloodTestsInputChange("ggt", v)}
           required
         />
         <FloatingInput
           label={t("uric_acid")}
           type="number"
-          value={bloodTestsFormData.uric_acid || 0}
+          min={1}
+          value={bloodTestsFormData.uric_acid}
           onChange={(v) => handleBloodTestsInputChange("uric_acid", v)}
           required
         />
@@ -916,14 +838,16 @@ const AddPatient = () => {
         <FloatingInput
           label={t("ferritin")}
           type="number"
-          value={bloodTestsFormData.ferritin || 0}
+          min={1}
+          value={bloodTestsFormData.ferritin}
           onChange={(v) => handleBloodTestsInputChange("ferritin", v)}
           required
         />
         <FloatingInput
           label={t("vitamin_b12")}
           type="number"
-          value={bloodTestsFormData.vitamin_b12 || 0}
+          min={1}
+          value={bloodTestsFormData.vitamin_b12}
           onChange={(v) => handleBloodTestsInputChange("vitamin_b12", v)}
           required
         />
@@ -932,14 +856,16 @@ const AddPatient = () => {
         <FloatingInput
           label={t("apoa1")}
           type="number"
-          value={bloodTestsFormData.apoa1 || 0}
+          min={1}
+          value={bloodTestsFormData.apoa1}
           onChange={(v) => handleBloodTestsInputChange("apoa1", v)}
           required
         />
         <FloatingInput
           label={t("apob")}
           type="number"
-          value={bloodTestsFormData.apob || 0}
+          min={1}
+          value={bloodTestsFormData.apob}
           onChange={(v) => handleBloodTestsInputChange("apob", v)}
           required
         />
@@ -948,14 +874,16 @@ const AddPatient = () => {
         <FloatingInput
           label={t("lipoprotein_a")}
           type="number"
-          value={bloodTestsFormData.lipoprotein_a || 0}
+          min={1}
+          value={bloodTestsFormData.lipoprotein_a}
           onChange={(v) => handleBloodTestsInputChange("lipoprotein_a", v)}
           required
         />
         <FloatingInput
           label={t("small_dense_ldl")}
           type="number"
-          value={bloodTestsFormData.small_dense_ldl || 0}
+          min={1}
+          value={bloodTestsFormData.small_dense_ldl}
           onChange={(v) => handleBloodTestsInputChange("small_dense_ldl", v)}
           required
         />
@@ -964,14 +892,16 @@ const AddPatient = () => {
         <FloatingInput
           label={t("hs_crp")}
           type="number"
-          value={bloodTestsFormData.hs_crp || 0}
+          min={1}
+          value={bloodTestsFormData.hs_crp}
           onChange={(v) => handleBloodTestsInputChange("hs_crp", v)}
           required
         />
         <FloatingInput
           label={t("homocysteine")}
           type="number"
-          value={bloodTestsFormData.homocysteine || 0}
+          min={1}
+          value={bloodTestsFormData.homocysteine}
           onChange={(v) => handleBloodTestsInputChange("homocysteine", v)}
           required
         />
@@ -980,14 +910,16 @@ const AddPatient = () => {
         <FloatingInput
           label={t("fasting_insulin")}
           type="number"
-          value={bloodTestsFormData.fasting_insulin || 0}
+          min={1}
+          value={bloodTestsFormData.fasting_insulin}
           onChange={(v) => handleBloodTestsInputChange("fasting_insulin", v)}
           required
         />
         <FloatingInput
           label={t("homa_ir")}
           type="number"
-          value={bloodTestsFormData.homa_ir || 0}
+          min={1}
+          value={bloodTestsFormData.homa_ir}
           onChange={(v) => handleBloodTestsInputChange("homa_ir", v)}
           required
         />
@@ -996,14 +928,16 @@ const AddPatient = () => {
         <FloatingInput
           label={t("c_peptide")}
           type="number"
-          value={bloodTestsFormData.c_peptide || 0}
+          min={1}
+          value={bloodTestsFormData.c_peptide}
           onChange={(v) => handleBloodTestsInputChange("c_peptide", v)}
           required
         />
         <FloatingInput
           label={t("adiponectin")}
           type="number"
-          value={bloodTestsFormData.adiponectin || 0}
+          min={1}
+          value={bloodTestsFormData.adiponectin}
           onChange={(v) => handleBloodTestsInputChange("adiponectin", v)}
           required
         />
@@ -1012,7 +946,8 @@ const AddPatient = () => {
         <FloatingInput
           label={t("omega_3_index")}
           type="number"
-          value={bloodTestsFormData.omega_3_index || 0}
+          min={1}
+          value={bloodTestsFormData.omega_3_index}
           onChange={(v) => handleBloodTestsInputChange("omega_3_index", v)}
           required
         />
@@ -1022,14 +957,16 @@ const AddPatient = () => {
         <FloatingInput
           label={t("galectin_3")}
           type="number"
-          value={bloodTestsFormData.galectin_3 || 0}
+          min={1}
+          value={bloodTestsFormData.galectin_3}
           onChange={(v) => handleBloodTestsInputChange("galectin_3", v)}
           required
         />
         <FloatingInput
           label={t("testosterone_total")}
           type="number"
-          value={bloodTestsFormData.testosterone_total || 0}
+          min={1}
+          value={bloodTestsFormData.testosterone_total}
           onChange={(v) => handleBloodTestsInputChange("testosterone_total", v)}
           required
         />
@@ -1039,14 +976,16 @@ const AddPatient = () => {
         <FloatingInput
           label={t("testosterone_free")}
           type="number"
-          value={bloodTestsFormData.testosterone_free || 0}
+          min={1}
+          value={bloodTestsFormData.testosterone_free}
           onChange={(v) => handleBloodTestsInputChange("testosterone_free", v)}
           required
         />
         <FloatingInput
           label={t("estradiol")}
           type="number"
-          value={bloodTestsFormData.estradiol || 0}
+          min={1}
+          value={bloodTestsFormData.estradiol}
           onChange={(v) => handleBloodTestsInputChange("estradiol", v)}
           required
         />
@@ -1055,14 +994,16 @@ const AddPatient = () => {
         <FloatingInput
           label={t("dhea_s")}
           type="number"
-          value={bloodTestsFormData.dhea_s || 0}
+          min={1}
+          value={bloodTestsFormData.dhea_s}
           onChange={(v) => handleBloodTestsInputChange("dhea_s", v)}
           required
         />
         <FloatingInput
           label={t("cortisol")}
           type="number"
-          value={bloodTestsFormData.cortisol || 0}
+          min={1}
+          value={bloodTestsFormData.cortisol}
           onChange={(v) => handleBloodTestsInputChange("cortisol", v)}
           required
         />
@@ -1071,14 +1012,16 @@ const AddPatient = () => {
         <FloatingInput
           label={t("igf_1")}
           type="number"
-          value={bloodTestsFormData.igf_1 || 0}
+          min={1}
+          value={bloodTestsFormData.igf_1}
           onChange={(v) => handleBloodTestsInputChange("igf_1", v)}
           required
         />
         <FloatingInput
           label={t("tsh")}
           type="number"
-          value={bloodTestsFormData.tsh || 0}
+          min={1}
+          value={bloodTestsFormData.tsh}
           onChange={(v) => handleBloodTestsInputChange("tsh", v)}
           required
         />
@@ -1087,14 +1030,16 @@ const AddPatient = () => {
         <FloatingInput
           label={t("free_t3")}
           type="number"
-          value={bloodTestsFormData.free_t3 || 0}
+          min={1}
+          value={bloodTestsFormData.free_t3}
           onChange={(v) => handleBloodTestsInputChange("free_t3", v)}
           required
         />
         <FloatingInput
           label={t("free_t4")}
           type="number"
-          value={bloodTestsFormData.free_t4 || 0}
+          min={1}
+          value={bloodTestsFormData.free_t4}
           onChange={(v) => handleBloodTestsInputChange("free_t4", v)}
           required
         />
@@ -1103,7 +1048,8 @@ const AddPatient = () => {
         <FloatingInput
           label={t("parathyroid_hormone_pth")}
           type="number"
-          value={bloodTestsFormData.parathyroid_hormone_pth || 0}
+          min={1}
+          value={bloodTestsFormData.parathyroid_hormone_pth}
           onChange={(v) =>
             handleBloodTestsInputChange("parathyroid_hormone_pth", v)
           }
@@ -1112,7 +1058,8 @@ const AddPatient = () => {
         <FloatingInput
           label={t("vitamin_k2")}
           type="number"
-          value={bloodTestsFormData.vitamin_k2 || 0}
+          min={1}
+          value={bloodTestsFormData.vitamin_k2}
           onChange={(v) => handleBloodTestsInputChange("vitamin_k2", v)}
           required
         />
@@ -1121,14 +1068,16 @@ const AddPatient = () => {
         <FloatingInput
           label={t("fecal_calprotectin")}
           type="number"
-          value={bloodTestsFormData.fecal_calprotectin || 0}
+          min={1}
+          value={bloodTestsFormData.fecal_calprotectin}
           onChange={(v) => handleBloodTestsInputChange("fecal_calprotectin", v)}
           required
         />
         <FloatingInput
           label={t("zonulin")}
           type="number"
-          value={bloodTestsFormData.zonulin || 0}
+          min={1}
+          value={bloodTestsFormData.zonulin}
           onChange={(v) => handleBloodTestsInputChange("zonulin", v)}
           required
         />
@@ -1136,8 +1085,8 @@ const AddPatient = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <FloatingInput
           label={t("stool_microbiome_profile")}
-          type="number"
-          value={bloodTestsFormData.stool_microbiome_profile || 0}
+          type="text"
+          value={bloodTestsFormData.stool_microbiome_profile}
           onChange={(v) =>
             handleBloodTestsInputChange("stool_microbiome_profile", v)
           }
@@ -1153,132 +1102,140 @@ const AddPatient = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <SelectInput
           label={t("smoker_status")}
-          options={[t("never"), t("former"), t("current")]}
+          options={[t("yes"), t("no")]}
           value={mentalHealthFormData.smoker_status}
-          onChange={(v) => handleMentalHealthInputChange("smoker_status", v)}
+          onChange={(v) => handleMentalHealthInputChange("smoker_status", v === t("yes"))}
           required
         />
         <SelectInput
           label={t("recreational_drug_use")}
-          options={[
-            t("none"),
-            t("occasional"),
-            t("regular"),
-            t("prefer_not_to_say"),
-          ]}
+          options={[t("yes"), t("no")]}
           value={mentalHealthFormData.recreational_drug_use}
           onChange={(v) =>
-            handleMentalHealthInputChange("recreational_drug_use", v)
+            handleMentalHealthInputChange("recreational_drug_use", v === t("yes"))
           }
           required
         />
         <FloatingInput
           label={t("sleep_quality")}
           type="number"
-          min="1"
-          max="10"
+          min={1}
+          max={10}
           value={mentalHealthFormData.sleep_quality_scale}
           onChange={(v) =>
-            handleMentalHealthInputChange("sleep_quality_scale", v)
+            handleMentalHealthInputChange("sleep_quality_scale", parseInt(v, 10))
           }
           required
         />
       </div>
+  
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <FloatingInput
           label={t("sleep_hours_weekday")}
           type="number"
+          min={1}
+          max={24}
+          step="any"
           value={mentalHealthFormData.sleep_hours_weekday_average}
           onChange={(v) =>
-            handleMentalHealthInputChange("sleep_hours_weekday_average", v)
+            handleMentalHealthInputChange("sleep_hours_weekday_average", parseFloat(v))
           }
           required
         />
         <FloatingInput
           label={t("sleep_hours_weekend")}
           type="number"
+          min={1}
+          max={24}
+          step="any"
           value={mentalHealthFormData.sleep_hours_weekend_average}
           onChange={(v) =>
-            handleMentalHealthInputChange("sleep_hours_weekend_average", v)
+            handleMentalHealthInputChange("sleep_hours_weekend_average", parseFloat(v))
           }
           required
         />
         <FloatingInput
           label={t("screen_time_before_bed")}
           type="number"
+          min={1}
+          max={24}
+          step="any"
           value={mentalHealthFormData.screen_time_before_bed}
           onChange={(v) =>
-            handleMentalHealthInputChange("screen_time_before_bed", v)
+            handleMentalHealthInputChange("screen_time_before_bed", parseInt(v, 10))
           }
           required
         />
       </div>
+  
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <FloatingInput
           label={t("stress_level")}
           type="number"
-          min="1"
-          max="10"
+          min={1}
+          max={10}
           value={mentalHealthFormData.stress_level_scale}
           onChange={(v) =>
-            handleMentalHealthInputChange("stress_level_scale", v)
+            handleMentalHealthInputChange("stress_level_scale", parseInt(v, 10))
           }
           required
         />
         <FloatingInput
           label={t("mood_level")}
           type="number"
-          min="1"
-          max="10"
+          min={1}
+          max={10}
           value={mentalHealthFormData.mood_scale}
-          onChange={(v) => handleMentalHealthInputChange("mood_scale", v)}
+          onChange={(v) => handleMentalHealthInputChange("mood_scale", parseInt(v, 10))}
           required
         />
         <FloatingInput
           label={t("energy_level")}
           type="number"
-          min="1"
-          max="10"
+          min={1}
+          max={10}
           value={mentalHealthFormData.energy_level_scale}
           onChange={(v) =>
-            handleMentalHealthInputChange("energy_level_scale", v)
+            handleMentalHealthInputChange("energy_level_scale", parseInt(v, 10))
           }
           required
         />
       </div>
+  
       <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
         <SelectInput
           label={t("mental_health_history")}
-          options={[
-            t("none"),
-            t("anxiety"),
-            t("depression"),
-            t("both"),
-            t("other"),
-          ]}
+          options={[t("yes"), t("no")]}
           value={mentalHealthFormData.history_anxiety_depression}
           onChange={(v) =>
-            handleMentalHealthInputChange("history_anxiety_depression", v)
+            handleMentalHealthInputChange("history_anxiety_depression", v === t("yes"))
           }
           required
         />
       </div>
     </div>
   );
+  
 
   // Exercise & Movement
   const ExerciseStep = () => (
     <div className="space-y-6">
+      {/* Weekly Exercise Frequency (integer) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <FloatingInput
           label={t("weekly_exercise_frequency")}
           type="number"
+          step="1"
+          min="0"
+          max="14"
           value={exerciseFormData.weekly_exercise_frequency}
           onChange={(v) =>
             handleExerciseInputChange("weekly_exercise_frequency", v)
           }
           required
         />
+  
+        {/* Weekly Exercise Type (string from options) */}
         <SelectInput
           label={t("exercise_type")}
           options={[
@@ -1290,10 +1247,14 @@ const AddPatient = () => {
             t("none"),
           ]}
           value={exerciseFormData.weekly_exercise_type}
-          onChange={(v) => handleExerciseInputChange("weekly_exercise_type", v)}
+          onChange={(v) =>
+            handleExerciseInputChange("weekly_exercise_type", v)
+          }
           required
         />
       </div>
+  
+      {/* Weekly Exercise Intensity + Steps Per Day */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <SelectInput
           label={t("exercise_intensity")}
@@ -1304,9 +1265,14 @@ const AddPatient = () => {
           }
           required
         />
+  
+        {/* Steps per Day (integer) */}
         <FloatingInput
           label={t("steps_per_day")}
           type="number"
+          step="1"
+          min="0"
+          max="50000"
           value={exerciseFormData.steps_per_day_average}
           onChange={(v) =>
             handleExerciseInputChange("steps_per_day_average", v)
@@ -1314,10 +1280,15 @@ const AddPatient = () => {
           required
         />
       </div>
+  
+      {/* Sedentary Hours + Mobility Limitations */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <FloatingInput
           label={t("sedentary_hours")}
           type="number"
+          step="0.1"
+          min="0"
+          max="24"
           value={exerciseFormData.sedentary_hours_per_day}
           onChange={(v) =>
             handleExerciseInputChange("sedentary_hours_per_day", v)
@@ -1326,14 +1297,20 @@ const AddPatient = () => {
         />
         <FloatingInput
           label={t("mobility_limitations")}
+          type="text"
           value={exerciseFormData.mobility_limitations}
-          onChange={(v) => handleExerciseInputChange("mobility_limitations", v)}
+          onChange={(v) =>
+            handleExerciseInputChange("mobility_limitations", v)
+          }
           required
         />
       </div>
+  
+      {/* Activity Tracker */}
       <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
         <FloatingInput
           label={t("activity_tracker")}
+          type="text"
           value={exerciseFormData.type_of_activity_tracker}
           onChange={(v) =>
             handleExerciseInputChange("type_of_activity_tracker", v)
@@ -1343,10 +1320,12 @@ const AddPatient = () => {
       </div>
     </div>
   );
+  
 
   // Medical History & Risk
   const MedicalHistoryStep = () => (
     <div className="space-y-6">
+      {/* Text Areas for Medical History */}
       <div className="space-y-4">
         <FloatingTextarea
           label={t("known_medical_conditions")}
@@ -1360,10 +1339,13 @@ const AddPatient = () => {
         <FloatingTextarea
           label={t("medications")}
           value={medicalHistoryFormData.medications}
-          onChange={(v) => handleMedicalHistoryInputChange("medications", v)}
+          onChange={(v) =>
+            handleMedicalHistoryInputChange("medications", v)
+          }
           required
         />
       </div>
+  
       <div className="space-y-4">
         <FloatingTextarea
           label={t("supplement_usage")}
@@ -1376,11 +1358,14 @@ const AddPatient = () => {
         <FloatingTextarea
           label={t("allergies")}
           value={medicalHistoryFormData.allergies}
-          onChange={(v) => handleMedicalHistoryInputChange("allergies", v)}
+          onChange={(v) =>
+            handleMedicalHistoryInputChange("allergies", v)
+          }
           required
         />
       </div>
-
+  
+      {/* Family History Section */}
       <h3 className="text-lg font-medium text-gray-700 mt-6 mb-3">
         {t("family_history")}
       </h3>
@@ -1388,10 +1373,8 @@ const AddPatient = () => {
         <SelectInput
           label={t("type_2_diabetes")}
           options={[
-            t("none"),
-            t("first_degree_relative"),
-            t("second_degree_relative"),
-            t("unknown"),
+            { label: t("yes"), value: true },
+            { label: t("no"), value: false },
           ]}
           value={medicalHistoryFormData.family_history_type2_diabetes}
           onChange={(v) =>
@@ -1402,10 +1385,8 @@ const AddPatient = () => {
         <SelectInput
           label={t("cardiovascular_disease")}
           options={[
-            t("none"),
-            t("first_degree_relative"),
-            t("second_degree_relative"),
-            t("unknown"),
+            { label: t("yes"), value: true },
+            { label: t("no"), value: false },
           ]}
           value={medicalHistoryFormData.family_history_cardiovascular_disease}
           onChange={(v) =>
@@ -1417,9 +1398,11 @@ const AddPatient = () => {
           required
         />
       </div>
+  
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <FloatingInput
           label={t("cancer_type")}
+          type="text"
           value={medicalHistoryFormData.family_history_cancer_type}
           onChange={(v) =>
             handleMedicalHistoryInputChange("family_history_cancer_type", v)
@@ -1429,10 +1412,8 @@ const AddPatient = () => {
         <SelectInput
           label={t("alzheimers_or_parkinsons")}
           options={[
-            t("none"),
-            t("first_degree_relative"),
-            t("second_degree_relative"),
-            t("unknown"),
+            { label: t("yes"), value: true },
+            { label: t("no"), value: false },
           ]}
           value={medicalHistoryFormData.family_history_alzheimers_parkinsons}
           onChange={(v) =>
@@ -1446,6 +1427,7 @@ const AddPatient = () => {
       </div>
     </div>
   );
+  
 
   const handleReportUpload = (e) => {
     const uploadedFiles = Array.from(e.target.files);
@@ -1761,7 +1743,7 @@ const AddPatient = () => {
 
 const FloatingInput = ({
   label,
-  type = "text",
+  type="text",
   value,
   onChange,
   placeholder,
@@ -1800,16 +1782,22 @@ const FloatingTextarea = ({ label, value, onChange, placeholder }) => (
 const SelectInput = ({ label, options, value, onChange }) => (
   <div className="relative">
     <select
-      value={value || ""}
+      value={value ?? ""}
       onChange={(e) => onChange(e.target.value)}
       className="w-full h-14 px-4 pt-6 pb-2 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-0 focus:outline-none transition-all duration-200 appearance-none bg-white"
     >
       <option value="" disabled></option>
-      {options.map((option, idx) => (
-        <option key={idx} value={option.toLowerCase()}>
-          {option}
-        </option>
-      ))}
+      {options.map((option, idx) => {
+        // Handle both string and { label, value } format
+        const labelText = typeof option === "string" ? option : option.label;
+        const valueText = typeof option === "string" ? option : option.value;
+
+        return (
+          <option key={idx} value={valueText}>
+            {labelText}
+          </option>
+        );
+      })}
     </select>
     <label className="absolute left-4 top-2 text-xs font-medium text-gray-500">
       {label}
@@ -1831,5 +1819,6 @@ const SelectInput = ({ label, options, value, onChange }) => (
     </div>
   </div>
 );
+
 
 export default AddPatient;
