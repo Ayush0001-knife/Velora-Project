@@ -23,6 +23,7 @@ const apiUrls = {
   EXERCISEPUT:(id) => `/v1/patient_exercise/patients/exercise/${id}`,
 
   PATIENTLIST: `/v1/patient/patients`,
+  PATIENTALLDATA:(id) => `/v1/patient/patient/${id}/all_data`,
 };
 
 export default apiUrls;

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiSearch } from "react-icons/fi";
 import { useTranslation } from "react-i18next";
+import { patientAllData } from "../services/api";
 
 const PatientList = ({data}) => {
   const navigate = useNavigate();
@@ -21,12 +22,11 @@ const PatientList = ({data}) => {
     }
   }, [data]);
 
-  const handlePrint = () => {
-    console.log("list",list)
-  }
-
-  const handleClick = (patient) => {
-    navigate("/patient", { state: { patient } });
+  const handleClick = async (item) => {
+    const response = await patientAllData(item.id);
+    const data = response.data;
+    console.log("data",data)
+    navigate("/patient", { state: data});
   };
 
   const handleSort = (key) => {
@@ -50,7 +50,7 @@ const PatientList = ({data}) => {
     <div className="w-[80%] h-[70vh] mx-auto bg-white rounded-2xl shadow-lg flex flex-col mt-5">
       {/* Header */}
       <div className="bg-blue-500 text-white p-6 flex-shrink-0 rounded-t-2xl">
-        <h1 className="text-2xl font-bold mb-4" onClick={handlePrint}>{t("patient_records")}</h1>
+        <h1 className="text-2xl font-bold mb-4">{t("patient_records")}</h1>
         <div className="flex items-center justify-between w-full">
           <div className="flex items-center">
             <input

@@ -3,8 +3,25 @@ import MoreDetails from "./MoreDetails";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import { useTranslation } from "react-i18next";
+import { useLocation } from "react-router-dom";
 
 const PatientPage = () => {
+  const location = useLocation();
+
+  const patientData = location.state;
+
+  const [patient, setPatient] = useState(patientData.patient);
+  const [analysis, setAnalysis] = useState(patientData.analysis);
+  const [anthropometrics, setAnthropometrics] = useState(patientData.anthropometrics);
+  const [blood_tests, setBloodTests] = useState(patientData.blood_tests);
+  const [cardiorespiratory, setCardiorespiratory] = useState(patientData.cardiorespiratory);
+  const [digital_inputs, setDigitalInputs] = useState(patientData.digital_inputs);
+  const [exercise, setExercise] = useState(patientData.exercise);
+  const [goals, setGoals] = useState(patientData.goals);
+  const [medical_history, setMedicalHistory] = useState(patientData.medical_history);
+  const [mental_health, setMentalHealth] = useState(patientData.mental_health);
+  const [nutrition, setNutrition] = useState(patientData.nutrition);
+
   const moreDetailsRef = useRef(null);
   const [moreDetails, setMoreDetails] = useState(false);
   const { t } = useTranslation();
@@ -43,6 +60,20 @@ const PatientPage = () => {
     },
   ]);
 
+  const handledtaaprint = () => {
+    console.log("patient", patient)
+    console.log("analysis", analysis)
+    console.log("anthropometrics", anthropometrics)
+    console.log("blood_tests", blood_tests)
+    console.log("cardiorespiratory", cardiorespiratory)
+    console.log("digital_inputs", digital_inputs)
+    console.log("exercise", exercise)
+    console.log("goals", goals)
+    console.log("medical_history", medical_history)
+    console.log("mental_health", mental_health)
+    console.log("nutrition", nutrition)
+  }
+
   useGSAP(() => {
     if (moreDetails) {
       gsap.to(moreDetailsRef.current, {
@@ -64,44 +95,45 @@ const PatientPage = () => {
   return (
     <div className="grid grid-cols-5 grid-rows-5 gap-0 w-full h-screen overflow-hidden">
       {/* Left Sidebar */}
-      <div className="col-start-1 col-end-2 row-start-1 row-end-6 p-2 flex items-center flex-col relative">
-        {/* Profile Photo */}
-        <div className="h-[30%] w-[85%] rounded-full shadow-md shadow-gray-500 overflow-hidden">
-          <img
-            src="https://images.rawpixel.com/image_800/czNmcy1wcml2YXRlL3Jhd3BpeGVsX2ltYWdlcy93ZWJzaXRlX2NvbnRlbnQvbHIvczc3LW1ja2luc2V5LTc2MTEtcG9tXzMuanBn.jpg"
-            className="h-full w-full object-cover"
-            alt="Profile"
-          />
-        </div>
+      <div className="col-start-1 col-end-2 row-start-1 row-end-6 p-2 flex items-center flex-col gap-5 relative">
+       
 
         {/* Basic Info */}
-        <div className="w-[90%] flex flex-col items-center my-6 space-y-2">
-          <span className="text-lg font-semibold">John Doe</span>
+        <div className="w-[90%] flex flex-col items-center gap-5 my-6">
+          <span className="text-lg font-semibold" onClick={handledtaaprint}>{patient.first_name} {patient.last_name}</span>
           <span className="text-sm text-gray-500 font-medium italic">
-            30/06/2025
+            {new Date(patient.create_date).toLocaleDateString('en-GB', {
+              day: '2-digit',
+              month: 'short',
+              year: 'numeric'
+            })}
           </span>
           <span className="text-sm text-blue-600 underline cursor-pointer hover:text-blue-800">
-            test@gmail.com
+            {patient.email}
           </span>
         </div>
 
         {/* Details Card + Overlay */}
         <div className="w-[90%] h-[55%] relative flex justify-center items-start">
           {/* Main Info Card */}
-          <div className="flex flex-col w-full h-full gap-2 bg-white border border-gray-600 shadow-md shadow-gray-400 rounded-[0.75rem] p-3 z-0">
-            <div className="grid grid-cols-2 gap-3">
+          <div className="flex flex-col w-full h-full gap-4 bg-white border border-gray-600 shadow-md shadow-gray-400 rounded-[0.75rem] p-3 z-0">
+            <div className="grid grid-cols-2 gap-4">
               {[
-                [t("patient_age"), t("32")],
-                [t("patient_sex"), t("male")],
-                [t("blood_group"), t("o_plus")],
-                [t("patient_height"), t("one_seventy_five_cm")],
-                [t("patient_weight"), t("seventy_kg")],
-                [t("patient_bmi"), t("twenty_two_point_nine")],
-                [t("sports_week"), t("ten")],
-                [t("vo2_max"), t("twenty_two")],
-                [t("exercise_week"), t("seven_hours")],
-                [t("sleep_night"), t("eight_hours")],
-                [t("steps_day"), t("ten_thousand")],
+                [t("patient_age"), patient.age ? patient.age : '-'],
+                [t("patient_sex"), patient.gender ? patient.gender : '-'],
+                [t("patient_height"), patient.height ? patient.height : '-'],
+                [t("patient_weight"), patient.weight ? patient.weight : '-'],
+                [t("vo2_max"), cardiorespiratory?.[0]?.vo2_max ? cardiorespiratory?.[0]?.vo2_max : '-'],
+                [t("exercise_week"), exercise?.[0]?.weekly_exercise_frequency ? exercise?.[0]?.weekly_exercise_frequency : '-'],
+                [t("steps_day"), exercise?.[0]?.steps_per_day_average ? exercise?.[0]?.steps_per_day_average : '-'],
+                [t("dob"), patient.date_of_birth ? new Date(patient.date_of_birth).toLocaleDateString('en-GB', {
+                  day: '2-digit',
+                  month: 'short',
+                  year: 'numeric'
+                }) : '-'],
+                [t("status"), patient.status ? patient.status : '-'],
+                [t("bodyfat"), anthropometrics?.[0]?.body_fat_percent || '-'],
+                [t("vitaminb12"), blood_tests?.[0]?.vitamin_b12 || '-'],
               ].map(([label, value]) => (
                 <div className="flex flex-col" key={label}>
                   <span className="text-sm font-medium capitalize">

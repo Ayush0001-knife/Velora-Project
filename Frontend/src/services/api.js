@@ -130,6 +130,14 @@ export const mentalHealthPut = async (formData,mentalHealthId) => {
 };
 
 export const exercisePut = async (formData,exerciseId) => {
+  /**
+   * @typedef {Object} ExercisePutResponse
+   * @property {boolean} success - Whether the request was successful
+   * @property {string} message - A message about the request
+   * @property {Exercise} data - The Exercise object with the updated data
+   *
+   * @type {Promise<ExercisePutResponse>}
+   */
   const response = await axiosInstance.put(apiUrl.EXERCISEPUT(exerciseId), formData);
   return response.data;
 };
@@ -143,6 +151,11 @@ export const patientGet = async () => {
   const response = await axiosInstance.get(apiUrl.PATIENTLIST);
   return response.data;
 };
+
+export const patientAllData = async (patientId) => {
+  const response = await axiosInstance.get(apiUrl.PATIENTALLDATA(patientId));
+  return response.data;
+}
 
 
 

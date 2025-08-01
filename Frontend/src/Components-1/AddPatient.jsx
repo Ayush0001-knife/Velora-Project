@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   User,
   Heart,
@@ -17,10 +17,18 @@ import {
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import LoaderDemo from "./Loader";
 import { anthropometrics, anthropometricsPut, bloodTests, bloodTestsPut, cardiorespiratory, cardiorespiratoryPut, demographics, demographicsPut, exercise, exercisePut, goals, medicalHistory, medicalHistoryPut, mentalHealth, mentalHealthPut, nutrition, nutritionPut, reportss } from "../services/api";
 
 const AddPatient = () => {
   const [activeStep, setActiveStep] = useState(0);
+
+  useEffect(() => {
+    if (activeStep === 8) {
+      KnowledgeBaseIDApi();
+    }
+  }, [activeStep]);
+
   const [patientId, setPatientId] = useState(null);
   const [anthropometricsId, setAnthropometricsId] = useState(null);
   const [vitalId, setVitalId] = useState(null);
@@ -29,6 +37,9 @@ const AddPatient = () => {
   const [mentalHealthId, setMentalHealthId] = useState(null);
   const [exerciseId, setExerciseId] = useState(null);
   const [medicalHistoryId, setMedicalHistoryId] = useState(null);
+  const [kbs, setKbs] = useState(null);
+
+  const navigate = useNavigate();
 
   const [demographicsFormData, setDemographicsFormData] = useState({});
   const [submittedDemographicsData, setSubmittedDemographicsData] = useState(null);
@@ -54,9 +65,6 @@ const AddPatient = () => {
   const [medicalHistoryFormData, setMedicalHistoryFormData] = useState({});
   const [submittedMedicalHistoryData, setSubmittedMedicalHistoryData] = useState(null);
 
-  const [goalsFormData, setGoalsFormData] = useState({});
-  const [submittedGoalsData, setSubmittedGoalsData] = useState(null);
-
   const [reports, setReports] = useState([]); // Array of File objects
   const [filesMeta, setFilesMeta] = useState({
     analysis_status: "Active",
@@ -78,7 +86,7 @@ const AddPatient = () => {
     { title: t("mental_health"), icon: Brain },
     { title: t("exercise"), icon: Activity },
     { title: t("medical_history"), icon: FileText },
-    { title: t("goals"), icon: Target },
+    { title: t("medical_files"), icon: Target },
   ];
 
   const handleDemographicsInputChange = (field, value) => {
@@ -113,9 +121,7 @@ const AddPatient = () => {
     setMedicalHistoryFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleGoalsInputChange = (field, value) => {
-    setGoalsFormData((prev) => ({ ...prev, [field]: value }));
-  };
+
 
   const handleDemographicsApi = async () => {
     console.log("Demographics API");
@@ -430,15 +436,22 @@ const AddPatient = () => {
     }
   };
 
-  const handleGoalsAPi = async () => {
-    console.log("Goals API");
-    try {
-      const data = await goals(goalsFormData,patientId);
-      console.log("Response:", data);
-    } catch (error) {
-      console.error("API Error:", error.response?.data || error.message);
+  const KnowledgeBaseIDApi = async () => {
+    const authorization = localStorage.getItem("authorization");
+    const body={
+      "owner_ids":[]
     }
-  };  
+    const response = await axios.post("http://127.0.0.1:9380/v1/kb/list?page=1&page_size=30&keywords=",body,
+      {
+        headers: {
+          Authorization: `${authorization}`
+        }
+      })
+      console.log("response",response.data.data.kbs[0].id)
+      const kbId=response.data.data.kbs[0].id
+      setKbs(kbId);
+      console.log("KbS id set ,", kbs);
+ };
 
   const handleFilesAPi = async () => {
     console.log("Reports array:", reports);
@@ -465,11 +478,33 @@ const AddPatient = () => {
     }
   }; 
 
+  const finalReportApi = async () => {
+    const authorization = localStorage.getItem("authorization");
+    const formData = new FormData();
+    formData.append("kb_id", kbs);
+
+    console.log("Sending final report request with: ");
+    console.log("patientId:", patientId);
+    console.log("kb_id:", kbs);
+    console.log("Authorization:", authorization);
+    
+    const response = await axios.post(`http://localhost:9380/v1/patient_analysis/patients/${patientId}/generate-final-report`,
+      formData,
+      {
+        headers: {
+          Authorization: `${authorization}`
+        }
+      })
+    console.log(response);
+  }
+
+
+
   const handleAddPatientAPi = async () => {
-    console.log("Add Patient API");
     await handleFilesAPi();
-    navigate("/home");
-    // await handleGoalsAPi(); // You can include other steps
+
+    await finalReportApi();
+    // navigate("/home");
   };
 
 
@@ -1650,34 +1685,13 @@ const AddPatient = () => {
   // Goals & Motivation
   
 
-  const GoalsStep = () => {
+  const MedicalFilesStep = () => {
     return (
       <div className="space-y-6">
         {/* Primary Goal */}
-        <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
-          <SelectInput
-            label={t("primary_health_goals")}
-            options={[
-              t("weight_loss"),
-              t("improved_sleep"),
-              t("increased_energy"),
-              t("longevity"),
-              t("disease_prevention"),
-              t("muscle_gain"),
-              t("performance_improvement"),
-              t("stress_reduction"),
-              t("other"),
-            ]}
-            value={goalsFormData.primaryGoal}
-            onChange={(v) => handleGoalsInputChange("primaryGoal", v)}
-          />
-        </div>
   
         {/* File Upload Section */}
         <div className="mt-6">
-          <h3 className="text-lg font-medium text-gray-700 mb-4">
-            {t("medical_reports_upload")}
-          </h3>
           <div className="flex items-center justify-center w-full">
             <label className="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
               <div className="flex flex-col items-center justify-center pt-5 pb-6">
@@ -1734,70 +1748,7 @@ const AddPatient = () => {
         </div>
   
         {/* Goals Inputs */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <SelectInput
-            label={t("preferred_intervention_focus")}
-            options={[
-              t("food_nutrition"),
-              t("sleep"),
-              t("physical_activity"),
-              t("mental_health"),
-              t("supplements"),
-              t("comprehensive_approach"),
-            ]}
-            value={goalsFormData.interventionFocus}
-            onChange={(v) => handleGoalsInputChange("interventionFocus", v)}
-          />
-          <FloatingInput
-            label={t("motivation_level")}
-            type="number"
-            min="1"
-            max="10"
-            value={goalsFormData.motivationLevel}
-            onChange={(v) => handleGoalsInputChange("motivationLevel", v)}
-          />
-        </div>
-  
-        <div className="space-y-4">
-          <FloatingTextarea
-            label={t("barriers_to_change")}
-            value={goalsFormData.barriers}
-            onChange={(v) => handleGoalsInputChange("barriers", v)}
-            placeholder={t("barriers_placeholder")}
-          />
-        </div>
-  
-        {/* Wearables */}
-        <h3 className="text-lg font-medium text-gray-700 mt-6 mb-3">
-          {t("digital_behavioral_inputs")}
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <SelectInput
-            label={t("wearable_connected")}
-            options={[t("yes"), t("no")]}
-            value={goalsFormData.wearableConnected}
-            onChange={(v) => handleGoalsInputChange("wearableConnected", v)}
-          />
-          <FloatingInput
-            label={t("device_type")}
-            value={goalsFormData.deviceType}
-            onChange={(v) => handleGoalsInputChange("deviceType", v)}
-            placeholder={t("device_type_placeholder")}
-          />
-          <SelectInput
-            label={t("data_streams_available")}
-            options={[
-              t("steps_day"),
-              t("sleep_staging"),
-              t("hrv"),
-              t("cgm"),
-              t("multiple"),
-              t("none"),
-            ]}
-            value={goalsFormData.dataStreams}
-            onChange={(v) => handleGoalsInputChange("dataStreams", v)}
-          />
-        </div>
+        
       </div>
     );
   };
@@ -1824,7 +1775,7 @@ const AddPatient = () => {
     MentalHealthStep,
     ExerciseStep,
     MedicalHistoryStep,
-    GoalsStep,
+    MedicalFilesStep,
   ];
 
   return (
@@ -1845,6 +1796,7 @@ const AddPatient = () => {
           <div className="flex justify-center overflow-x-auto py-2">
             <div className="flex items-center space-x-4 md:space-x-4">
               {steps.map((step, index) => (
+              
                 <div key={index} className="flex items-center">
                   <div
                     className={`flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all duration-300 ${
@@ -1853,7 +1805,7 @@ const AddPatient = () => {
                         : "border-gray-300 text-gray-400"
                     }`}
                   >
-                    <step.icon className="h-5 w-5" />
+                    <step.icon className="h-5 w-5" onClick={() => setActiveStep(index)}/>
                   </div>
                   {index < steps.length - 1 && (
                     <div
