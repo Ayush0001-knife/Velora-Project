@@ -21,6 +21,8 @@ const apiUrls = {
   BLOODTESTSPUT:(id) => `/v1/patient_blood_test/blood_test/${id}`,
   MENTALHEALTHPUT:(id) => `/v1/patient_mental_health/mental_health/${id}`,
   EXERCISEPUT:(id) => `/v1/patient_exercise/patients/exercise/${id}`,
+
+  PATIENTLIST: `/v1/patient/patients`,
 };
 
 export default apiUrls;

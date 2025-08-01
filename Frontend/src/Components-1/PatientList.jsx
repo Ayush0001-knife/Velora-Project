@@ -1,102 +1,29 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiSearch } from "react-icons/fi";
 import { useTranslation } from "react-i18next";
 
-const PatientList = () => {
+const PatientList = ({data}) => {
   const navigate = useNavigate();
 
   const { t } = useTranslation();
 
-  const data = [
-    {
-      name: "Ayush Kumar",
-      sex: "Male",
-      age: 25,
-      bmi: 20.5,
-      reportGenerated: true,
-    },
-    {
-      name: "Priya Sharma",
-      sex: "Female",
-      age: 32,
-      bmi: 22.1,
-      reportGenerated: false,
-    },
-    {
-      name: "Rahul Verma",
-      sex: "Male",
-      age: 45,
-      bmi: 26.8,
-      reportGenerated: true,
-    },
-    {
-      name: "Anjali Patel",
-      sex: "Female",
-      age: 28,
-      bmi: 19.2,
-      reportGenerated: false,
-    },
-    {
-      name: "Vikram Singh",
-      sex: "Male",
-      age: 39,
-      bmi: 24.5,
-      reportGenerated: true,
-    },
-    {
-      name: "Neha Gupta",
-      sex: "Female",
-      age: 31,
-      bmi: 21.7,
-      reportGenerated: true,
-    },
-    {
-      name: "Ravi Mishra",
-      sex: "Male",
-      age: 27,
-      bmi: 23.0,
-      reportGenerated: false,
-    },
-    {
-      name: "Sneha Joshi",
-      sex: "Female",
-      age: 24,
-      bmi: 20.8,
-      reportGenerated: true,
-    },
-    {
-      name: "Arun Desai",
-      sex: "Male",
-      age: 41,
-      bmi: 25.3,
-      reportGenerated: false,
-    },
-    {
-      name: "Arun Desai",
-      sex: "Male",
-      age: 41,
-      bmi: 25.3,
-      reportGenerated: false,
-    },
-    {
-      name: "Arun Desai",
-      sex: "Male",
-      age: 41,
-      bmi: 25.3,
-      reportGenerated: false,
-    },
-    {
-      name: "John Desai",
-      sex: "Male",
-      age: 41,
-      bmi: 25.3,
-      reportGenerated: false,
-    },
-  ];
 
-  const [list, setList] = useState(data);
+
+
+
+  const [list, setList] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+
+  useEffect(() => {
+    if (data) {
+      setList(data);
+    }
+  }, [data]);
+
+  const handlePrint = () => {
+    console.log("list",list)
+  }
 
   const handleClick = (patient) => {
     navigate("/patient", { state: { patient } });
@@ -111,15 +38,19 @@ const PatientList = () => {
     setList(sorted);
   };
 
-  const filteredList = list.filter((patient) =>
-    patient.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+
+  const filteredList = list.filter((patient) => {
+    const fullName = `${patient.first_name ?? ""} ${patient.last_name ?? ""}`;
+    return fullName.toLowerCase().includes(searchTerm.toLowerCase());
+  });
+  
+
 
   return (
     <div className="w-[80%] h-[70vh] mx-auto bg-white rounded-2xl shadow-lg flex flex-col mt-5">
       {/* Header */}
       <div className="bg-blue-500 text-white p-6 flex-shrink-0 rounded-t-2xl">
-        <h1 className="text-2xl font-bold mb-4">{t("patient_records")}</h1>
+        <h1 className="text-2xl font-bold mb-4" onClick={handlePrint}>{t("patient_records")}</h1>
         <div className="flex items-center justify-between w-full">
           <div className="flex items-center">
             <input
@@ -146,13 +77,13 @@ const PatientList = () => {
       {/* Table Header */}
       <div className="bg-gray-200 flex px-6 py-4 sticky top-0 z-10 border-b border-gray-200">
         <div
-          onClick={() => handleSort("name")}
+          onClick={() => handleSort("first_name")}
           className="w-[20%] px-4 font-semibold text-gray-700 cursor-pointer hover:text-blue-500"
         >
           {t("patient_name")}
         </div>
         <div
-          onClick={() => handleSort("sex")}
+          onClick={() => handleSort("gender")}
           className="w-[15%] px-4 text-center font-semibold text-gray-700 cursor-pointer hover:text-blue-500"
         >
           {t("gender")}
@@ -179,16 +110,16 @@ const PatientList = () => {
 
       {/* Patient Rows */}
       <div className="flex-grow overflow-y-auto px-6">
-        {filteredList.map((item, index) => (
+        {list.map((item, index) => (
           <div
             key={index}
             onClick={() => handleClick(item)}
             className="flex py-4 border-b border-gray-200 hover:bg-gray-50 cursor-pointer"
           >
-            <div className="w-[20%] px-4 font-medium">{item.name}</div>
-            <div className="w-[15%] px-4 text-center">{item.sex}</div>
+            <div className="w-[20%] px-4 font-medium">{item.first_name}{" "}{item.last_name}</div>
+            <div className="w-[15%] px-4 text-center">{item.gender}</div>
             <div className="w-[15%] px-4 text-center">{item.age}</div>
-            <div className="w-[15%] px-4 text-center">{item.bmi}</div>
+            <div className="w-[15%] px-4 text-center">{(item.weight / (item.height * item.height)).toFixed(2)}</div>
             <div className="w-[20%] px-4 text-center">
               <span
                 className={`inline-block px-3 py-1 rounded-full text-xs font-semibold uppercase ${

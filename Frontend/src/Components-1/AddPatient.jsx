@@ -172,7 +172,7 @@ const AddPatient = () => {
     try {
       // First-time submission: POST
       if (submittedAnthropometricsData === null) {
-        const response = await anthropometrics(normalizedData); // POST
+        const response = await anthropometrics(normalizedData,patientId); // POST
         console.log("POST Response:", response.message);
         console.log("Anthropometrics ID:",response.record.anthropometric_id)
         setAnthropometricsId(response.record.anthropometric_id);
@@ -211,7 +211,7 @@ const AddPatient = () => {
     try {
       // First-time submission: POST
       if (submittedCardiorespiratoryData === null) {
-        const response = await cardiorespiratory(normalizedData); // POST
+        const response = await cardiorespiratory(normalizedData,patientId); // POST
         console.log("POST Response:", response.message);
         console.log("Cardiorespiratory ID:",response.data.vital_id)
         setVitalId(response.data.vital_id);
@@ -240,7 +240,7 @@ const AddPatient = () => {
   };
  
 
-  const handleNutritionApi = async () => {
+  const handleNutritionApi = async () => {  
     console.log("Nutrition API");
   
     const normalizedData = {
@@ -251,7 +251,7 @@ const AddPatient = () => {
     try {
       // First-time submission: POST
       if (submittedNutritionData === null) {
-        const response = await nutrition(normalizedData); // POST
+        const response = await nutrition(normalizedData,patientId); // POST
         console.log("POST Response:", response.message);
         console.log("Nutrition ID:",response.data.nutrition_id)
         setNutritionId(response.data.nutrition_id);
@@ -289,7 +289,7 @@ const AddPatient = () => {
     try {
       // First-time submission: POST
       if (submittedBloodTestsData === null) {
-        const response = await bloodTests(normalizedData); // POST
+        const response = await bloodTests(normalizedData,patientId); // POST
         console.log("POST Response:", response.message);
         console.log("Blood Tests ID:",response.data.blood_tests_id)
         setBloodTestsId(response.data.blood_tests_id);
@@ -327,7 +327,7 @@ const AddPatient = () => {
     try {
       // First-time submission: POST
       if (submittedMentalHealthData === null) {
-        const response = await mentalHealth(normalizedData); // POST
+        const response = await mentalHealth(normalizedData,patientId); // POST
         console.log("POST Response:", response.message);
         console.log("Mental Health ID:",response.data.mental_health_id)
         setMentalHealthId(response.data.mental_health_id);
@@ -365,7 +365,7 @@ const AddPatient = () => {
     try {
       // First-time submission: POST
       if (submittedExerciseData === null) {
-        const response = await exercise(normalizedData); // POST
+        const response = await exercise(normalizedData,patientId); // POST
         console.log("POST Response:", response.message);
         console.log("Exercise ID:",response.data.exercise_id)
         setExerciseId(response.data.exercise_id);
@@ -403,7 +403,7 @@ const AddPatient = () => {
     try {
       // First-time submission: POST
       if (submittedMedicalHistoryData === null) {
-        const response = await medicalHistory(normalizedData); // POST
+        const response = await medicalHistory(normalizedData,patientId); // POST
         console.log("POST Response:", response.message);
         console.log("Medical History ID:",response.data.medical_history_id)
         setMedicalHistoryId(response.data.medical_history_id);
@@ -468,6 +468,7 @@ const AddPatient = () => {
   const handleAddPatientAPi = async () => {
     console.log("Add Patient API");
     await handleFilesAPi();
+    navigate("/home");
     // await handleGoalsAPi(); // You can include other steps
   };
 
@@ -576,13 +577,7 @@ const AddPatient = () => {
           onChange={(v) => handleDemographicsInputChange("status", v)}
           required
         />
-        <FloatingInput
-          label={t("assigned_doctor_id")}
-          type="number"
-          value={demographicsFormData.assigned_doctor_id}
-          onChange={(v) => handleDemographicsInputChange("assigned_doctor_id", v)}
-          required
-        />
+        
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <SelectInput
@@ -630,15 +625,6 @@ const AddPatient = () => {
           label={t("occupation")}
           value={demographicsFormData.occupation}
           onChange={(v) => handleDemographicsInputChange("occupation", v)}
-          required
-        />
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <FloatingInput
-          label={t("created_by")}
-          type="text"
-          value={demographicsFormData.created_by}
-          onChange={(v) => handleDemographicsInputChange("created_by", v)}
           required
         />
       </div>

@@ -139,6 +139,11 @@ export const medicalHistoryPut = async (formData,medicalHistoryId) => {
   return response.data;
 };
 
+export const patientGet = async () => {
+  const response = await axiosInstance.get(apiUrl.PATIENTLIST);
+  return response.data;
+};
+
 
 
 
