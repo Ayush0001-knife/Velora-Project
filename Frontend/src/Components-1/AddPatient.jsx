@@ -516,12 +516,38 @@ const AddPatient = () => {
 
 
 
+  // const handleAddPatientAPi = async () => {
+  //   if (reports.length === 0) {
+  //     // No new reports to upload → directly go home
+  //     navigate("/home");
+  //   } else {
+  //     // Reports exist → try uploading
+  //     try {
+  //       await handleFilesAPi();
+  //       await finalReportApi();
+  //     } catch (error) {
+  //       console.error("API error occurred:", error);
+  //       // Optional: show toast/snackbar here
+  //     } finally {
+  //       // Always navigate to home
+  //       navigate("/home");
+  //     }
+  //   }
+  // };
+  
+  
   const handleAddPatientAPi = async () => {
-    await handleFilesAPi();
-    await finalReportApi();
-    navigate("/home");
+    try {
+      await handleFilesAPi();
+      await finalReportApi();
+    } catch (error) {
+      console.error("API error occurred:", error);
+      // Optionally show a toast or alert here
+    } finally {
+      // Navigate to home no matter what
+      navigate("/home");
+    }
   };
-
 
     
 
