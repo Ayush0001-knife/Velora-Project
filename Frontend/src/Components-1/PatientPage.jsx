@@ -133,7 +133,7 @@ const PatientPage = () => {
     console.log(response);
   };
   
-  const handlereportGenClick = async () => {
+  const handlereportGen = async () => {
     const kbId = await KnowledgeBaseIDApi();
     if (kbId) {
       await finalReportApi(kbId);
@@ -141,6 +141,7 @@ const PatientPage = () => {
       console.error("Cannot generate report: kbId is null.");
     }
   };
+  
   
 
   return (
@@ -475,7 +476,7 @@ const PatientPage = () => {
           </button>
 
           {/* Generate New Report Button */}
-          <button className="flex items-center justify-center gap-2 py-4 px-3 bg-purple-100 rounded-[0.75rem] hover:bg-purple-200 transition-colors" onClick={handlereportGenClick}>
+          <button className="flex items-center justify-center gap-2 py-4 px-3 bg-purple-100 rounded-[0.75rem] hover:bg-purple-200 transition-colors" onClick={handlereportGen}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-5 w-5 text-purple-600"
