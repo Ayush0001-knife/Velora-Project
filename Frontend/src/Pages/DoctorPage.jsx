@@ -4,7 +4,6 @@ import PatientList from "../Components-1/PatientList";
 import { patientGet } from "../services/api";
 
 const DoctorPage = () => {
-
   const [patientList, setPatientList] = useState([]);
 
   useEffect(() => {
@@ -18,16 +17,17 @@ const DoctorPage = () => {
     };
 
     fetchPatients();
-  }, []); 
+  }, []);
+
+
 
   return (
-    <>
-      <div className="h-screen ">
-        <DoctorNavbar />
-        <PatientList data={patientList} />
-      </div>
-    </>
+    <div className="h-screen">
+      <DoctorNavbar />
+      <PatientList data={patientList} />
+    </div>
   );
 };
 
 export default DoctorPage;
+

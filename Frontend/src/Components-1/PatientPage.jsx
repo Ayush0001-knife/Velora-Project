@@ -1,9 +1,10 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import MoreDetails from "./MoreDetails";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import { useTranslation } from "react-i18next";
 import { useLocation } from "react-router-dom";
+import axios from "axios";
 
 const PatientPage = () => {
   const location = useLocation();
@@ -21,6 +22,7 @@ const PatientPage = () => {
   const [medical_history, setMedicalHistory] = useState(patientData.medical_history);
   const [mental_health, setMentalHealth] = useState(patientData.mental_health);
   const [nutrition, setNutrition] = useState(patientData.nutrition);
+  const [kbs, setKbs] = useState(null);
 
   const moreDetailsRef = useRef(null);
   const [moreDetails, setMoreDetails] = useState(false);
@@ -92,11 +94,60 @@ const PatientPage = () => {
     }
   }, [moreDetails]);
 
+  const KnowledgeBaseIDApi = async () => {
+    const authorization = localStorage.getItem("authorization");
+    const body = { owner_ids: [] };
+  
+    try {
+      const response = await axios.post(
+        "http://127.0.0.1:9380/v1/kb/list?page=1&page_size=30&keywords=",
+        body,
+        { headers: { Authorization: `${authorization}` } }
+      );
+  
+      const kbId = response.data.data.kbs[0]?.id;
+      console.log("Fetched kbId:", kbId);
+      setKbs(kbId); // still optional, if you want to show it elsewhere
+      return kbId;  // return directly
+    } catch (error) {
+      console.error("Failed to fetch Knowledge Base ID:", error);
+      return null;
+    }
+  };
+  
+  const finalReportApi = async (kbId) => {
+    const authorization = localStorage.getItem("authorization");
+    const formData = new FormData();
+    formData.append("kb_id", kbId);
+  
+    console.log("Sending final report request with: ");
+    console.log("patientId:", patient.id);
+    console.log("kb_id:", kbId);
+    console.log("Authorization:", authorization);
+  
+    const response = await axios.post(
+      `http://localhost:9380/v1/patient_analysis/patients/${patient.id}/generate-final-report`,
+      formData,
+      { headers: { Authorization: `${authorization}` } }
+    );
+    console.log(response);
+  };
+  
+  const handlereportGenClick = async () => {
+    const kbId = await KnowledgeBaseIDApi();
+    if (kbId) {
+      await finalReportApi(kbId);
+    } else {
+      console.error("Cannot generate report: kbId is null.");
+    }
+  };
+  
+
   return (
     <div className="grid grid-cols-5 grid-rows-5 gap-0 w-full h-screen overflow-hidden">
       {/* Left Sidebar */}
       <div className="col-start-1 col-end-2 row-start-1 row-end-6 p-2 flex items-center flex-col gap-5 relative">
-       
+
 
         {/* Basic Info */}
         <div className="w-[90%] flex flex-col items-center gap-5 my-6">
@@ -424,7 +475,7 @@ const PatientPage = () => {
           </button>
 
           {/* Generate New Report Button */}
-          <button className="flex items-center justify-center gap-2 py-4 px-3 bg-purple-100 rounded-[0.75rem] hover:bg-purple-200 transition-colors">
+          <button className="flex items-center justify-center gap-2 py-4 px-3 bg-purple-100 rounded-[0.75rem] hover:bg-purple-200 transition-colors" onClick={handlereportGenClick}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-5 w-5 text-purple-600"

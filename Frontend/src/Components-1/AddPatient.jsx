@@ -438,20 +438,36 @@ const AddPatient = () => {
 
   const KnowledgeBaseIDApi = async () => {
     const authorization = localStorage.getItem("authorization");
-    const body={
-      "owner_ids":[]
-    }
-    const response = await axios.post("http://127.0.0.1:9380/v1/kb/list?page=1&page_size=30&keywords=",body,
-      {
-        headers: {
-          Authorization: `${authorization}`
+    const body = {
+      owner_ids: []
+    };
+  
+    try {
+      const response = await axios.post(
+        "http://127.0.0.1:9380/v1/kb/list?page=1&page_size=30&keywords=",
+        body,
+        {
+          headers: {
+            Authorization: `${authorization}`
+          }
         }
-      })
-      console.log("response",response.data.data.kbs[0].id)
-      const kbId=response.data.data.kbs[0].id
-      setKbs(kbId);
-      console.log("KbS id set ,", kbs);
- };
+      );
+      
+      const kbId = response.data.data.kbs[0]?.id;
+      console.log("Fetched kbId:", kbId);
+      setKbs(kbId); // async, won't reflect immediately in next line
+    } catch (error) {
+      console.error("Failed to fetch Knowledge Base ID:", error);
+    }
+  };
+  
+  // To log updated kbs
+  useEffect(() => {
+    if (kbs) {
+      console.log("Updated KbS id:", kbs);
+    }
+  }, [kbs]);
+  
 
   const handleFilesAPi = async () => {
     console.log("Reports array:", reports);
@@ -502,9 +518,8 @@ const AddPatient = () => {
 
   const handleAddPatientAPi = async () => {
     await handleFilesAPi();
-
     await finalReportApi();
-    // navigate("/home");
+    navigate("/home");
   };
 
 

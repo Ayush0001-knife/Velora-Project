@@ -4,29 +4,29 @@ import { FiSearch } from "react-icons/fi";
 import { useTranslation } from "react-i18next";
 import { patientAllData } from "../services/api";
 
-const PatientList = ({data}) => {
+const PatientList = ({ data }) => {
   const navigate = useNavigate();
-
   const { t } = useTranslation();
-
-
-
-
 
   const [list, setList] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
 
+  // Update list when prop changes
   useEffect(() => {
-    if (data) {
+    if (Array.isArray(data)) {
       setList(data);
+    } else {
+      console.warn("Expected array for 'data', received:", data);
+      setList([]); // fallback to prevent crash
     }
   }, [data]);
+
+
 
   const handleClick = async (item) => {
     const response = await patientAllData(item.id);
     const data = response.data;
-    console.log("data",data)
-    navigate("/patient", { state: data});
+    navigate("/patient", { state: data });
   };
 
   const handleSort = (key) => {
@@ -39,18 +39,11 @@ const PatientList = ({data}) => {
   };
 
 
-  const filteredList = list.filter((patient) => {
-    const fullName = `${patient.first_name ?? ""} ${patient.last_name ?? ""}`;
-    return fullName.toLowerCase().includes(searchTerm.toLowerCase());
-  });
-  
-
-
   return (
     <div className="w-[80%] h-[70vh] mx-auto bg-white rounded-2xl shadow-lg flex flex-col mt-5">
       {/* Header */}
       <div className="bg-blue-500 text-white p-6 flex-shrink-0 rounded-t-2xl">
-        <h1 className="text-2xl font-bold mb-4">{t("patient_records")}</h1>
+        <h1 className="text-2xl font-bold mb-4" onClick={()=>console.log("List ",list)}>{t("patient_records")}</h1>
         <div className="flex items-center justify-between w-full">
           <div className="flex items-center">
             <input
@@ -64,7 +57,7 @@ const PatientList = ({data}) => {
           </div>
           <button
             type="button"
-            className="btn btn-light h-[4rem] w-[13rem] "
+            className="btn btn-light h-[4rem] w-[13rem]"
             onClick={() => navigate("/add-patient")}
           >
             <span className="text-lg font-semibold text-blue-600">
@@ -110,29 +103,39 @@ const PatientList = ({data}) => {
 
       {/* Patient Rows */}
       <div className="flex-grow overflow-y-auto px-6">
-        {list.map((item, index) => (
-          <div
-            key={index}
-            onClick={() => handleClick(item)}
-            className="flex py-4 border-b border-gray-200 hover:bg-gray-50 cursor-pointer"
-          >
-            <div className="w-[20%] px-4 font-medium">{item.first_name}{" "}{item.last_name}</div>
-            <div className="w-[15%] px-4 text-center">{item.gender}</div>
-            <div className="w-[15%] px-4 text-center">{item.age}</div>
-            <div className="w-[15%] px-4 text-center">{(item.weight / (item.height * item.height)).toFixed(2)}</div>
-            <div className="w-[20%] px-4 text-center">
-              <span
-                className={`inline-block px-3 py-1 rounded-full text-xs font-semibold uppercase ${
-                  item.reportGenerated
-                    ? "bg-green-100 text-green-800"
-                    : "bg-yellow-100 text-yellow-800"
-                }`}
-              >
-                {item.reportGenerated ? "Complete" : "Pending"}
-              </span>
+        {list.map((item, index) => {
+          const heightInMeters = item.height || 1.6; // Avoid division by zero
+          const bmi =
+            item.weight && item.height
+              ? (item.weight / (heightInMeters * heightInMeters)).toFixed(2)
+              : "-";
+
+          return (
+            <div
+              key={index}
+              onClick={() => handleClick(item)}
+              className="flex py-4 border-b border-gray-200 hover:bg-gray-50 cursor-pointer"
+            >
+              <div className="w-[20%] px-4 font-medium">
+                {item.first_name} {item.last_name}
+              </div>
+              <div className="w-[15%] px-4 text-center">{item.gender}</div>
+              <div className="w-[15%] px-4 text-center">{item.age}</div>
+              <div className="w-[15%] px-4 text-center">{bmi}</div>
+              <div className="w-[20%] px-4 text-center">
+                <span
+                  className={`inline-block px-3 py-1 rounded-full text-xs font-semibold uppercase ${
+                    item.reportGenerated
+                      ? "bg-green-100 text-green-800"
+                      : "bg-yellow-100 text-yellow-800"
+                  }`}
+                >
+                  {item.reportGenerated ? "Complete" : "Pending"}
+                </span>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
