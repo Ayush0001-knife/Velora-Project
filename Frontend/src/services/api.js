@@ -157,6 +157,11 @@ export const patientAllData = async (patientId) => {
   return response.data;
 }
 
+export const GENERATEFINALREPORT = async (patientId,formData) => {
+  const response = await axiosInstance.post(apiUrl.FINALREPORTGEN(patientId),formData);
+  return response.data;
+}
+
 
 
 

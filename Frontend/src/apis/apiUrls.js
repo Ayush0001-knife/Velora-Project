@@ -24,6 +24,7 @@ const apiUrls = {
 
   PATIENTLIST: `/v1/patient/patients`,
   PATIENTALLDATA:(id) => `/v1/patient/patient/${id}/all_data`,
+  FINALREPORTGEN:(id) => `/v1/report/reports/${id}/generate-final-report`,
 };
 
 export default apiUrls;

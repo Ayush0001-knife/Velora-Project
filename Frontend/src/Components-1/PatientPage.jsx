@@ -5,6 +5,7 @@ import { useGSAP } from "@gsap/react";
 import { useTranslation } from "react-i18next";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
+import { GENERATEFINALREPORT } from "../services/api";
 
 const PatientPage = () => {
   const location = useLocation();
@@ -97,14 +98,14 @@ const PatientPage = () => {
   const KnowledgeBaseIDApi = async () => {
     const authorization = localStorage.getItem("authorization");
     const body = { owner_ids: [] };
-  
+
     try {
       const response = await axios.post(
         "http://127.0.0.1:9380/v1/kb/list?page=1&page_size=30&keywords=",
         body,
         { headers: { Authorization: `${authorization}` } }
       );
-  
+
       const kbId = response.data.data.kbs[0]?.id;
       console.log("Fetched kbId:", kbId);
       setKbs(kbId); // still optional, if you want to show it elsewhere
@@ -114,35 +115,96 @@ const PatientPage = () => {
       return null;
     }
   };
-  
+
   const finalReportApi = async (kbId) => {
     const authorization = localStorage.getItem("authorization");
     const formData = new FormData();
     formData.append("kb_id", kbId);
-  
+
     console.log("Sending final report request with: ");
     console.log("patientId:", patient.id);
     console.log("kb_id:", kbId);
     console.log("Authorization:", authorization);
-  
+
     const response = await axios.post(
       `http://localhost:9380/v1/patient_analysis/patients/${patient.id}/generate-final-report`,
       formData,
       { headers: { Authorization: `${authorization}` } }
     );
     console.log(response);
+    return response;
   };
-  
+
   const handlereportGen = async () => {
+    const authorization = localStorage.getItem("authorization");
     const kbId = await KnowledgeBaseIDApi();
-    if (kbId) {
-      await finalReportApi(kbId);
-    } else {
+    const patientId = patient.id;
+  
+    if (!kbId) {
       console.error("Cannot generate report: kbId is null.");
+      return;
+    }
+  
+    try {
+
+      if(analysis.length === 0){
+        const finalReportResponse = await finalReportApi(kbId);
+  
+      if (!finalReportResponse) {
+        console.error("finalReportApi returned null or undefined");
+        return;
+      }
+      console.log("Final Report API Response", finalReportResponse.data);
+
+      }
+
+      
+  
+  
+      // Step 2: Prepare form data
+      const formData = new FormData();
+      formData.append("kb_id", kbId);
+      formData.append("is_report", true);
+  
+      // Step 3: Call the generate-final-report endpoint
+      const response = await axios.post(
+        `http://127.0.0.1:9380/v1/report/reports/${patientId}/generate-final-report`,
+        formData,
+        {
+          responseType: "blob",
+          headers: { Authorization: `${authorization}` },
+        }
+      );
+  
+      // Step 4: Create a downloadable link from the blob
+      const blob = new Blob([response.data], {
+        type: response.headers["content-type"] || "application/pdf",
+      });
+  
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+  
+      // Optional: dynamically generate file name
+      const fileName = `Final_Report_${patientId}_${new Date()
+        .toISOString()
+        .slice(0, 10)}.pdf`;
+  
+      link.setAttribute("download", fileName);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url); // Cleanup
+  
+      console.log("PDF file downloaded successfully.");
+  
+    } catch (error) {
+      console.error("Error during report generation:", error);
     }
   };
   
-  
+
+
 
   return (
     <div className="grid grid-cols-5 grid-rows-5 gap-0 w-full h-screen overflow-hidden">
