@@ -147,16 +147,16 @@ const PatientPage = () => {
   
     try {
 
-      if(analysis.length === 0){
-        const finalReportResponse = await finalReportApi(kbId);
+      // if(analysis.length === 0){
+      //   const finalReportResponse = await finalReportApi(kbId);
   
-      if (!finalReportResponse) {
-        console.error("finalReportApi returned null or undefined");
-        return;
-      }
-      console.log("Final Report API Response", finalReportResponse.data);
+      // if (!finalReportResponse) {
+      //   console.error("finalReportApi returned null or undefined");
+      //   return;
+      // }
+      // console.log("Final Report API Response", finalReportResponse.data);
 
-      }
+      // }
 
       
   
