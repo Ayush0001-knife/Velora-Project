@@ -17,10 +17,12 @@ const PatientList = ({ data }) => {
       setList(data);
     } else {
       console.warn("Expected array for 'data', received:", data);
-      setList([]); // fallback to prevent crash
+      setList([]); 
+      
     }
   }, [data]);
 
+  
 
 
   const handleClick = async (item) => {

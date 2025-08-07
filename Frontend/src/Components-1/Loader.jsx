@@ -1,11 +1,11 @@
 import React from 'react';
 
-const Loader = ({ 
-  size = 'md', 
-  color = 'blue', 
-  text = 'Loading...', 
+const Loader = ({
+  size = 'md',
+  color = 'blue',
+  text = 'Loading...',
   showText = true,
-  variant = 'spinner' 
+  variant = 'spinner'
 }) => {
   const sizeClasses = {
     sm: 'w-6 h-6',
@@ -32,7 +32,7 @@ const Loader = ({
       {[0, 1, 2].map((i) => (
         <div
           key={i}
-          className={`w-3 h-3 bg-${color}-500 rounded-full animate-bounce`}
+          className={`w-3 h-3 rounded-full animate-bounce bg-${color}-500`}
           style={{ animationDelay: `${i * 0.1}s` }}
         />
       ))}
@@ -49,10 +49,7 @@ const Loader = ({
         <div
           key={i}
           className={`w-2 h-8 bg-${color}-500 animate-pulse`}
-          style={{ 
-            animationDelay: `${i * 0.1}s`,
-            animationDuration: '1s' 
-          }}
+          style={{ animationDelay: `${i * 0.1}s`, animationDuration: '1s' }}
         />
       ))}
     </div>
@@ -72,24 +69,19 @@ const Loader = ({
 
   const renderLoader = () => {
     switch (variant) {
-      case 'dots':
-        return <DotsLoader />;
-      case 'pulse':
-        return <PulseLoader />;
-      case 'bars':
-        return <BarsLoader />;
-      case 'ripple':
-        return <RippleLoader />;
-      default:
-        return <SpinnerLoader />;
+      case 'dots': return <DotsLoader />;
+      case 'pulse': return <PulseLoader />;
+      case 'bars': return <BarsLoader />;
+      case 'ripple': return <RippleLoader />;
+      default: return <SpinnerLoader />;
     }
   };
 
   return (
-    <div className="flex flex-col items-center justify-center space-y-4 p-8">
+    <div className="flex flex-col items-center justify-center space-y-4">
       {renderLoader()}
       {showText && (
-        <p className="text-gray-600 font-medium animate-pulse">
+        <p className="text-gray-700 font-medium animate-pulse text-lg">
           {text}
         </p>
       )}
@@ -97,73 +89,30 @@ const Loader = ({
   );
 };
 
-// Demo component showing different loader variations
-const LoaderDemo = () => {
-  const [currentLoader, setCurrentLoader] = React.useState(0);
-  
-  const loaderConfigs = [
-    { variant: 'spinner', color: 'blue', size: 'lg', text: 'Loading...' },
-    { variant: 'dots', color: 'purple', size: 'md', text: 'Please wait...' },
-    { variant: 'pulse', color: 'green', size: 'xl', text: 'Processing...' },
-    { variant: 'bars', color: 'orange', size: 'md', text: 'Fetching data...' },
-    { variant: 'ripple', color: 'pink', size: 'lg', text: 'Almost ready...' }
-  ];
-
-  React.useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentLoader((prev) => (prev + 1) % loaderConfigs.length);
-    }, 3000);
-
-    return () => clearInterval(interval);
-  }, []);
+// Overlay Loader Component
+export const OverlayLoader = ({
+  isVisible,
+  variant = 'ripple',
+  color = 'green',
+  size = 'xl',
+  text = 'Loading...',
+  showText = true
+}) => {
+  if (!isVisible) return null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col items-center justify-center">
-      <div className="bg-white rounded-2xl shadow-2xl p-12 max-w-md w-full mx-4">
-        <h1 className="text-3xl font-bold text-gray-800 text-center mb-8">
-          Modern Loaders
-        </h1>
-        
-        <div className="min-h-[120px] flex items-center justify-center">
-          <Loader {...loaderConfigs[currentLoader]} />
-        </div>
-        
-        <div className="flex justify-center space-x-2 mt-8">
-          {loaderConfigs.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentLoader(index)}
-              className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                index === currentLoader 
-                  ? 'bg-blue-500 scale-125' 
-                  : 'bg-gray-300 hover:bg-gray-400'
-              }`}
-            />
-          ))}
-        </div>
-        
-        <div className="mt-6 text-center">
-          <p className="text-sm text-gray-500 mb-2">Current variant:</p>
-          <code className="bg-gray-100 px-3 py-1 rounded-md text-sm font-mono">
-            {loaderConfigs[currentLoader].variant}
-          </code>
-        </div>
-      </div>
-      
-      <div className="mt-8 text-center max-w-2xl px-4">
-        <h2 className="text-xl font-semibold text-gray-700 mb-4">Usage</h2>
-        <div className="bg-gray-800 text-green-400 p-4 rounded-lg text-left font-mono text-sm overflow-x-auto">
-          <div className="mb-2">{'<Loader'}</div>
-          <div className="ml-4">{'variant="spinner" // spinner, dots, pulse, bars, ripple'}</div>
-          <div className="ml-4">{'color="blue" // blue, purple, green, red, orange, pink'}</div>
-          <div className="ml-4">{'size="lg" // sm, md, lg, xl'}</div>
-          <div className="ml-4">{'text="Loading..."'}</div>
-          <div className="ml-4">{'showText={true}'}</div>
-          <div>{'/>'}</div>
-        </div>
+    <div className="absolute inset-0 z-50 flex items-center justify-center">
+      <div className="absolute inset-0 bg-transparent backdrop-blur-sm"></div>      <div className="relative z-10">
+        <Loader
+          variant={variant}
+          color={color}
+          size={size}
+          text={text}
+          showText={showText}
+        />
       </div>
     </div>
   );
 };
 
-export default LoaderDemo;
+export default Loader;

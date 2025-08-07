@@ -6,9 +6,12 @@ import { useTranslation } from "react-i18next";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
 import { GENERATEFINALREPORT } from "../services/api";
+import { useNavigate } from "react-router-dom";
+import { OverlayLoader } from "./Loader";
 
 const PatientPage = () => {
   const location = useLocation();
+  const navigate = useNavigate();
 
   const patientData = location.state;
 
@@ -25,43 +28,103 @@ const PatientPage = () => {
   const [nutrition, setNutrition] = useState(patientData.nutrition);
   const [kbs, setKbs] = useState(null);
 
+  const [loader, setLoader] = useState({
+    isVisible: false,
+    variant: "ripple",
+    color: "green",
+    size: "xl",
+    text: "Loading...",
+  });
+
+
+
   const moreDetailsRef = useRef(null);
   const [moreDetails, setMoreDetails] = useState(false);
   const { t } = useTranslation();
 
   // Sample processed documents data
-  const [documents] = useState([
-    {
-      name: "Blood Test Analysis",
-      date: "2024-03-15",
-      score: 95,
-      type: "Generated",
-    },
-    {
-      name: "ECG Report",
-      date: "2024-03-10",
-      score: 88,
-      type: "Uploaded",
-    },
-    {
-      name: "ECG Report",
-      date: "2024-03-10",
-      score: 88,
-      type: "Uploaded",
-    },
-    {
-      name: "ECG Report",
-      date: "2024-03-10",
-      score: 88,
-      type: "Uploaded",
-    },
-    {
-      name: "Cardiography",
-      date: "2024-03-10",
-      score: 88,
-      type: "Uploaded",
-    },
-  ]);
+  const [documents, setDocuments] = useState([]);
+
+  useEffect(() => {
+    const fetchKbId = async () => {
+      const kbId = await KnowledgeBaseIDApi();
+      if (kbId) {
+        setKbs(kbId);
+      }
+    };
+
+    fetchKbId();
+  }, []);
+
+  useEffect(() => {
+    if (!analysis || analysis.length === 0 || !patient?.id || !kbs) return;
+
+    const authorization = localStorage.getItem("authorization");
+
+    const formattedDocs = analysis.flatMap((item) => {
+      const date = new Date(item.create_date);
+      const docs = [];
+
+      if (item.patient_analysis_report) {
+        docs.push({
+          name: "Patient Analysis Report",
+          date,
+          url: item.patient_analysis_report,
+          type: "Analysis",
+        });
+      }
+
+      if (item.patient_ocr_report) {
+        docs.push({
+          name: "Patient OCR Report",
+          date,
+          url: item.patient_ocr_report,
+          type: "OCR",
+        });
+      }
+
+      return docs;
+    });
+
+    const fetchDocuments = async () => {
+      try {
+        const response = await axios.get(
+          `http://127.0.0.1:9380/v1/document/documents/by-patient/${patient.id}?kb_id=${kbs}&page=1&page_size=10&orderby=create_time&desc=true`,
+          {
+            headers: {
+              Authorization: `${authorization}`,
+            },
+          }
+        );
+
+        const fetchedDocs = response.data.data.docs || [];
+
+        const formattedFetchedDocs = fetchedDocs.map((doc) => ({
+          name: "Patient Combined Document",
+          date: new Date(doc.create_date),
+          url: `http://127.0.0.1:9380/v1/document/download/${doc.id}`,
+          type: "Combined",
+        }));
+
+        // ✅ Merge and sort by date (newest first)
+        const allDocs = [...formattedDocs, ...formattedFetchedDocs].sort(
+          (a, b) => new Date(b.date) - new Date(a.date)
+        );
+
+        setDocuments(allDocs);
+
+      } catch (error) {
+        console.error("❌ Error fetching patient combined documents:", error);
+        setDocuments(formattedDocs); // Fallback to just analysis+OCR
+      }
+    };
+
+    fetchDocuments();
+  }, [analysis, patient?.id, kbs]);
+
+
+
+
 
   const handledtaaprint = () => {
     console.log("patient", patient)
@@ -137,77 +200,88 @@ const PatientPage = () => {
 
   const handlereportGen = async () => {
     const authorization = localStorage.getItem("authorization");
-    const kbId = await KnowledgeBaseIDApi();
     const patientId = patient.id;
-  
-    if (!kbId) {
+
+    if (!kbs) {
       console.error("Cannot generate report: kbId is null.");
+      alert("Knowledge Base ID not available. Try again.");
       return;
     }
-  
+
     try {
+      // Show dynamic loader
+      setLoader({
+        isVisible: true,
+        variant: "dots", // 🔁 Or "bars", "dots", etc.
+        color: "green",
+        size: "md",
+        text: "Generating Final Report...",
+      });
 
-      // if(analysis.length === 0){
-      //   const finalReportResponse = await finalReportApi(kbId);
-  
-      // if (!finalReportResponse) {
-      //   console.error("finalReportApi returned null or undefined");
-      //   return;
-      // }
-      // console.log("Final Report API Response", finalReportResponse.data);
-
-      // }
-
-      
-  
-  
-      // Step 2: Prepare form data
       const formData = new FormData();
-      formData.append("kb_id", kbId);
+      formData.append("kb_id", kbs);
       formData.append("is_report", true);
-  
-      // Step 3: Call the generate-final-report endpoint
+
       const response = await axios.post(
         `http://127.0.0.1:9380/v1/report/reports/${patientId}/generate-final-report`,
         formData,
         {
           responseType: "blob",
-          headers: { Authorization: `${authorization}` },
+          headers: {
+            Authorization: `${authorization}`,
+          },
         }
       );
-  
-      // Step 4: Create a downloadable link from the blob
+
+      // Create Blob and URL
       const blob = new Blob([response.data], {
         type: response.headers["content-type"] || "application/pdf",
       });
-  
+
       const url = window.URL.createObjectURL(blob);
+
+      // Open in new tab
+      window.open(url, "_blank");
+
+      // Download the file
       const link = document.createElement("a");
-      link.href = url;
-  
-      // Optional: dynamically generate file name
       const fileName = `Final_Report_${patientId}_${new Date()
         .toISOString()
-        .slice(0, 10)}.pdf`;
-  
+        .replace(/[:.]/g, "-")}.pdf`;
+
+      link.href = url;
       link.setAttribute("download", fileName);
       document.body.appendChild(link);
       link.click();
       link.remove();
-      window.URL.revokeObjectURL(url); // Cleanup
-  
-      console.log("PDF file downloaded successfully.");
-  
+
+      // Update documents list
+      const newDoc = {
+        name: "Final Generated Report",
+        date: new Date().toISOString(),
+        url,
+        score: null,
+        type: "Generated",
+      };
+
+      setDocuments((prevDocs) => [newDoc, ...prevDocs]);
     } catch (error) {
-      console.error("Error during report generation:", error);
+      console.error("Error generating final report:", error);
+      alert("Something went wrong while generating the report.");
+    } finally {
+      // Hide loader
+      setLoader((prev) => ({ ...prev, isVisible: false }));
     }
   };
-  
+
 
 
 
   return (
     <div className="grid grid-cols-5 grid-rows-5 gap-0 w-full h-screen overflow-hidden">
+      <OverlayLoader {...loader} isVisible={loader.isVisible} />
+
+
       {/* Left Sidebar */}
       <div className="col-start-1 col-end-2 row-start-1 row-end-6 p-2 flex items-center flex-col gap-5 relative">
 
@@ -306,59 +380,95 @@ const PatientPage = () => {
         </h2>
         <div className="h-[calc(100%-56px)] overflow-y-auto p-3">
           <div className="space-y-2">
-            {documents.map((doc, index) => (
-              <div
-                key={index}
-                className="flex items-center justify-between bg-white p-3 rounded-lg hover:bg-gray-50 transition-all duration-200 border border-gray-100 shadow-sm hover:shadow-md"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-blue-100 rounded-lg">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4 text-blue-600"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                      />
-                    </svg>
+            {documents.length === 0 ? (
+              <p className="text-sm text-gray-500">No documents available.</p>
+            ) : (
+              <>
+                {documents.map((doc, index) => (
+                  <div
+                    key={index}
+                    className="block cursor-pointer"
+                    onClick={() => {
+                      try {
+                        // Open in new tab
+                        const newTab = window.open("", "_blank");
+
+                        // Fetch the file as blob
+                        fetch(doc.url)
+                          .then((res) => res.blob())
+                          .then((blob) => {
+                            const blobUrl = URL.createObjectURL(blob);
+
+                            // Redirect new tab to blob
+                            if (newTab) {
+                              newTab.location.href = blobUrl;
+                            }
+
+                            // Trigger download
+                            const link = document.createElement("a");
+                            link.href = blobUrl;
+                            link.download = `${doc.name}.pdf`;
+                            document.body.appendChild(link);
+                            link.click();
+                            link.remove();
+                          });
+                      } catch (err) {
+                        console.error("Failed to open or download document", err);
+                      }
+                    }}
+                  >
+                    <div className="flex items-center justify-between bg-white p-3 rounded-lg hover:bg-gray-50 transition-all duration-200 border border-gray-100 shadow-sm hover:shadow-md mb-2">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-blue-100 rounded-lg">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-4 w-4 text-blue-600"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                            />
+                          </svg>
+                        </div>
+                        <div>
+                          <h3 className="font-medium text-sm text-gray-800">{doc.name}</h3>
+                          <p className="text-xs text-gray-500 mt-0.5">
+                            {new Date(doc.date).toLocaleString("en-GB", {
+                              day: "2-digit",
+                              month: "short",
+                              year: "numeric",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                              hour12: true,
+                            })}
+                          </p>
+                        </div>
+                      </div>
+                      <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-4 w-4 text-gray-600"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
+                        </svg>
+                      </button>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-medium text-sm text-gray-800">
-                      {doc.name}{" "}
-                    </h3>
-                    <p className="text-xs text-gray-500 mt-0.5">
-                      {new Date(doc.date).toLocaleDateString()} • {doc.date}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="text-center bg-gray-50 px-3 py-1 rounded-full">
-                    <span className="block font-semibold text-sm text-gray-800">
-                      {doc.score}
-                    </span>
-                    <span className="text-xs text-gray-500">
-                      Document Score
-                    </span>
-                  </div>
-                  <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4 text-gray-600"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
-                    </svg>
-                  </button>
-                </div>
-              </div>
-            ))}
+                ))}
+              </>
+            )}
+
+
+
+
+
           </div>
         </div>
       </div>
@@ -557,8 +667,7 @@ const PatientPage = () => {
               {t("generate_report")}
             </span>
           </button>
-
-          {/* View History Button */}
+          {/* View Chat Button */}
           <button className="flex items-center justify-center gap-2 py-4 px-3 bg-orange-100 rounded-[0.75rem] hover:bg-orange-200 transition-colors">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -575,12 +684,13 @@ const PatientPage = () => {
               />
             </svg>
             <span className="text-sm font-medium text-orange-600">
-              {t("view_history")}
+              {t("open_chat")}
             </span>
           </button>
 
-          {/* Send Email Button */}
-          <button className="flex items-center justify-center gap-2 py-4 px-3 bg-red-100 rounded-[0.75rem] hover:bg-red-200 transition-colors">
+          {/* Send Dashboard Button */}
+          <button className="flex items-center justify-center gap-2 py-4 px-3 bg-red-100 rounded-[0.75rem] hover:bg-red-200 transition-colors"
+            onClick={() => navigate("/home")}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-5 w-5 text-red-600"
@@ -596,7 +706,7 @@ const PatientPage = () => {
               />
             </svg>
             <span className="text-sm font-medium text-red-600">
-              {t("send_report")}
+              {t("go_to_dashboard")}
             </span>
           </button>
 

@@ -359,7 +359,10 @@
   "medical_files": "Medical Reports Upload",
   "dob": "Date of Birth",
   "bodyfat": "Body Fat %",
-  "vitaminb12": "Vitamin B12"
+  "vitaminb12": "Vitamin B12",
+  "go_to_dashboard": "Go to Dashboard",
+  "open_chat": "Open Chat",
+  "height_m": "Height (m)"
 
 
 

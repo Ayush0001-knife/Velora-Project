@@ -17,7 +17,8 @@ import {
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import LoaderDemo from "./Loader";
+import { OverlayLoader } from "./Loader";
+
 import { anthropometrics, anthropometricsPut, bloodTests, bloodTestsPut, cardiorespiratory, cardiorespiratoryPut, demographics, demographicsPut, exercise, exercisePut, goals, medicalHistory, medicalHistoryPut, mentalHealth, mentalHealthPut, nutrition, nutritionPut, reportss } from "../services/api";
 
 const AddPatient = () => {
@@ -39,10 +40,21 @@ const AddPatient = () => {
   const [medicalHistoryId, setMedicalHistoryId] = useState(null);
   const [kbs, setKbs] = useState(null);
 
+  const [loader, setLoader] = useState({
+    isVisible: false,
+    variant: "ripple",
+    color: "green",
+    size: "xl",
+    text: "Loading...",
+  });
+
   const navigate = useNavigate();
 
   const [demographicsFormData, setDemographicsFormData] = useState({});
   const [submittedDemographicsData, setSubmittedDemographicsData] = useState(null);
+
+  const [emailError, setEmailError] = useState("");
+
 
   const [anthropometricsFormData, setAnthropometricsFormData] = useState({});
   const [submittedAnthropometricsData, setSubmittedAnthropometricsData] = useState(null);
@@ -50,7 +62,7 @@ const AddPatient = () => {
   const [cardiorespiratoryFormData, setCardiorespiratoryFormData] = useState({});
   const [submittedCardiorespiratoryData, setSubmittedCardiorespiratoryData] = useState(null);
 
-  const [nutritionFormData, setNutritionFormData] = useState({ });
+  const [nutritionFormData, setNutritionFormData] = useState({});
   const [submittedNutritionData, setSubmittedNutritionData] = useState(null);
 
   const [bloodTestsFormData, setBloodTestsFormData] = useState({});
@@ -73,6 +85,22 @@ const AddPatient = () => {
   });
 
 
+  // Email validation function
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!email) {
+      return "Email is required";
+    }
+
+    if (!emailRegex.test(email)) {
+      return "Please enter a valid email address";
+    }
+
+    return ""; // No error
+  };
+
+
 
 
   const { t } = useTranslation();
@@ -90,12 +118,43 @@ const AddPatient = () => {
   ];
 
   const handleDemographicsInputChange = (field, value) => {
-    setDemographicsFormData((prev) => ({ ...prev, [field]: value }));
+    setDemographicsFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+
+    // Real-time email validation
+    if (field === 'email') {
+      const error = validateEmail(value);
+      setEmailError(error);
+    }
   };
+
 
   const handleAnthropometricsInputChange = (field, value) => {
     setAnthropometricsFormData((prev) => ({ ...prev, [field]: value }));
   };
+
+  useEffect(() => {
+    const weight = parseFloat(anthropometricsFormData.weight_kg);
+    const heightCm = parseFloat(anthropometricsFormData.height_cm);
+
+    if (weight > 0 && heightCm > 0) {
+      const heightInMeters = heightCm / 100;
+      const calculatedBmi = (weight / (heightInMeters * heightInMeters)).toFixed(2);
+
+      setAnthropometricsFormData((prev) => ({
+        ...prev,
+        bmi: calculatedBmi,
+      }));
+    } else {
+      setAnthropometricsFormData((prev) => ({
+        ...prev,
+        bmi: "",
+      }));
+    }
+  }, [anthropometricsFormData.weight_kg, anthropometricsFormData.height_cm]);
+
 
   const handleCardiorespiratoryInputChange = (field, value) => {
     setCardiorespiratoryFormData((prev) => ({ ...prev, [field]: value }));
@@ -125,67 +184,70 @@ const AddPatient = () => {
 
   const handleDemographicsApi = async () => {
     console.log("Demographics API");
-  
-    // Normalize age to an integer before comparing/sending
+
+    // Validate email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const isEmailValid = emailRegex.test(demographicsFormData.email);
+
+    if (!isEmailValid) {
+      setEmailError("Please enter a valid email address.");
+      return; // 🔁 Don't proceed with API
+    } else {
+      setEmailError(""); // Clear previous error
+    }
+
     const normalizedData = {
       ...demographicsFormData,
       age: Number(demographicsFormData.age),
       assigned_doctor_id: Number(demographicsFormData.assigned_doctor_id),
       zip_code: String(demographicsFormData.zip_code),
-      // Add more conversions if needed
     };
-  
+
     try {
-      // First-time submission: POST
       if (submittedDemographicsData === null) {
-        const response = await demographics(normalizedData); // POST
+        const response = await demographics(normalizedData);
         console.log("POST Response:", response.message);
-        console.log("Patient ID:",response.data.id)
-
-  
-        setPatientId(response.data.id); // Or response.data.patient_id
-        setSubmittedDemographicsData(normalizedData); // Save submitted state
-      }
-  
-      // Data has changed: PUT
-      else if (JSON.stringify(normalizedData) !== JSON.stringify(submittedDemographicsData)) {
-        console.log("PUT Data:", normalizedData);
-        console.log("PUT Patient ID:", patientId);
+        setPatientId(response.data.id);
+        setSubmittedDemographicsData(normalizedData);
+      } else if (
+        JSON.stringify(normalizedData) !==
+        JSON.stringify(submittedDemographicsData)
+      ) {
         const response = await demographicsPut(normalizedData, patientId);
-
         console.log("PUT Response:", response.data);
-  
-        setSubmittedDemographicsData(normalizedData); // Save updated state
-      }
-  
-      // No change: Skip API
-      else {
+        setSubmittedDemographicsData(normalizedData);
+      } else {
         console.log("No changes in demographics — skipping API call.");
       }
     } catch (error) {
-      console.error("Demographics API Error:", error.response?.data || error.message);
+      console.error(
+        "Demographics API Error:",
+        error.response?.data || error.message
+      );
     }
   };
-  
+
+
+
   const handleAnthropometricsApi = async () => {
     console.log("Anthropometrics API");
-  
+
     const normalizedData = {
       ...anthropometricsFormData
       // Add more conversions if needed
     };
-  
+
     try {
       // First-time submission: POST
       if (submittedAnthropometricsData === null) {
-        const response = await anthropometrics(normalizedData,patientId); // POST
+        const response = await anthropometrics(normalizedData, patientId); // POST
         console.log("POST Response:", response.message);
-        console.log("Anthropometrics ID:",response.record.anthropometric_id)
+        console.log("Anthropometrics ID:", response.record.anthropometric_id)
         setAnthropometricsId(response.record.anthropometric_id);
-  
+
         setSubmittedAnthropometricsData(normalizedData); // Save submitted state
       }
-  
+
       // Data has changed: PUT
       else if (JSON.stringify(normalizedData) !== JSON.stringify(submittedAnthropometricsData)) {
         console.log("PUT Data:", normalizedData);
@@ -193,10 +255,10 @@ const AddPatient = () => {
         const response = await anthropometricsPut(normalizedData, anthropometricsId);
 
         console.log("PUT Response:", response.message);
-  
+
         setSubmittedAnthropometricsData(normalizedData); // Save updated state
       }
-  
+
       // No change: Skip API
       else {
         console.log("No changes in anthropometrics — skipping API call.");
@@ -208,23 +270,23 @@ const AddPatient = () => {
 
   const handleCardiorespiratoryApi = async () => {
     console.log("Cardiorespiratory API");
-  
+
     const normalizedData = {
       ...cardiorespiratoryFormData
       // Add more conversions if needed
     };
-  
+
     try {
       // First-time submission: POST
       if (submittedCardiorespiratoryData === null) {
-        const response = await cardiorespiratory(normalizedData,patientId); // POST
+        const response = await cardiorespiratory(normalizedData, patientId); // POST
         console.log("POST Response:", response.message);
-        console.log("Cardiorespiratory ID:",response.data.vital_id)
+        console.log("Cardiorespiratory ID:", response.data.vital_id)
         setVitalId(response.data.vital_id);
-  
+
         setSubmittedCardiorespiratoryData(normalizedData); // Save submitted state
       }
-  
+
       // Data has changed: PUT
       else if (JSON.stringify(normalizedData) !== JSON.stringify(submittedCardiorespiratoryData)) {
         console.log("PUT Data:", normalizedData);
@@ -232,10 +294,10 @@ const AddPatient = () => {
         const response = await cardiorespiratoryPut(normalizedData, vitalId);
 
         console.log("PUT Response:", response.message);
-  
+
         setSubmittedCardiorespiratoryData(normalizedData); // Save updated state
       }
-  
+
       // No change: Skip API
       else {
         console.log("No changes in cardiorespiratory — skipping API call.");
@@ -244,37 +306,37 @@ const AddPatient = () => {
       console.error("Cardiorespiratory API Error:", error.response?.data || error.message);
     }
   };
- 
 
-  const handleNutritionApi = async () => {  
+
+  const handleNutritionApi = async () => {
     console.log("Nutrition API");
-  
+
     const normalizedData = {
       ...nutritionFormData
       // Add more conversions if needed
     };
-  
+
     try {
       // First-time submission: POST
       if (submittedNutritionData === null) {
-        const response = await nutrition(normalizedData,patientId); // POST
+        const response = await nutrition(normalizedData, patientId); // POST
         console.log("POST Response:", response.message);
-        console.log("Nutrition ID:",response.data.nutrition_id)
+        console.log("Nutrition ID:", response.data.nutrition_id)
         setNutritionId(response.data.nutrition_id);
-  
+
         setSubmittedNutritionData(normalizedData); // Save submitted state
       }
-  
+
       // Data has changed: PUT
       else if (JSON.stringify(normalizedData) !== JSON.stringify(submittedNutritionData)) {
         console.log("PUT Data:", normalizedData);
         const response = await nutritionPut(normalizedData, nutritionId);
 
         console.log("PUT Response:", response.message);
-  
+
         setSubmittedNutritionData(normalizedData); // Save updated state
       }
-  
+
       // No change: Skip API
       else {
         console.log("No changes in nutrition — skipping API call.");
@@ -286,33 +348,33 @@ const AddPatient = () => {
 
   const handleBloodTestsApi = async () => {
     console.log("Blood Tests API");
-  
+
     const normalizedData = {
       ...bloodTestsFormData
       // Add more conversions if needed
     };
-  
+
     try {
       // First-time submission: POST
       if (submittedBloodTestsData === null) {
-        const response = await bloodTests(normalizedData,patientId); // POST
+        const response = await bloodTests(normalizedData, patientId); // POST
         console.log("POST Response:", response.message);
-        console.log("Blood Tests ID:",response.data.blood_tests_id)
+        console.log("Blood Tests ID:", response.data.blood_tests_id)
         setBloodTestsId(response.data.blood_tests_id);
-  
+
         setSubmittedBloodTestsData(normalizedData); // Save submitted state
       }
-  
+
       // Data has changed: PUT
       else if (JSON.stringify(normalizedData) !== JSON.stringify(submittedBloodTestsData)) {
         console.log("PUT Data:", normalizedData);
         const response = await bloodTestsPut(normalizedData, bloodTestsId);
 
         console.log("PUT Response:", response.message);
-  
+
         setSubmittedBloodTestsData(normalizedData); // Save updated state
       }
-  
+
       // No change: Skip API
       else {
         console.log("No changes in blood tests — skipping API call.");
@@ -324,33 +386,33 @@ const AddPatient = () => {
 
   const handleMentalHealthApi = async () => {
     console.log("Mental Health API");
-  
+
     const normalizedData = {
       ...mentalHealthFormData
       // Add more conversions if needed
     };
-  
+
     try {
       // First-time submission: POST
       if (submittedMentalHealthData === null) {
-        const response = await mentalHealth(normalizedData,patientId); // POST
+        const response = await mentalHealth(normalizedData, patientId); // POST
         console.log("POST Response:", response.message);
-        console.log("Mental Health ID:",response.data.mental_health_id)
+        console.log("Mental Health ID:", response.data.mental_health_id)
         setMentalHealthId(response.data.mental_health_id);
-  
+
         setSubmittedMentalHealthData(normalizedData); // Save submitted state
       }
-  
+
       // Data has changed: PUT
       else if (JSON.stringify(normalizedData) !== JSON.stringify(submittedMentalHealthData)) {
         console.log("PUT Data:", normalizedData);
         const response = await mentalHealthPut(normalizedData, mentalHealthId);
 
         console.log("PUT Response:", response.message);
-  
+
         setSubmittedMentalHealthData(normalizedData); // Save updated state
       }
-  
+
       // No change: Skip API
       else {
         console.log("No changes in mental health — skipping API call.");
@@ -362,33 +424,33 @@ const AddPatient = () => {
 
   const handleExerciseApi = async () => {
     console.log("Exercise API");
-  
+
     const normalizedData = {
       ...exerciseFormData
       // Add more conversions if needed
     };
-  
+
     try {
       // First-time submission: POST
       if (submittedExerciseData === null) {
-        const response = await exercise(normalizedData,patientId); // POST
+        const response = await exercise(normalizedData, patientId); // POST
         console.log("POST Response:", response.message);
-        console.log("Exercise ID:",response.data.exercise_id)
+        console.log("Exercise ID:", response.data.exercise_id)
         setExerciseId(response.data.exercise_id);
-  
+
         setSubmittedExerciseData(normalizedData); // Save submitted state
       }
-  
+
       // Data has changed: PUT
       else if (JSON.stringify(normalizedData) !== JSON.stringify(submittedExerciseData)) {
         console.log("PUT Data:", normalizedData);
         const response = await exercisePut(normalizedData, exerciseId);
 
         console.log("PUT Response:", response.message);
-  
+
         setSubmittedExerciseData(normalizedData); // Save updated state
       }
-  
+
       // No change: Skip API
       else {
         console.log("No changes in exercise — skipping API call.");
@@ -400,33 +462,33 @@ const AddPatient = () => {
 
   const handleMedicalHistoryApi = async () => {
     console.log("Medical History API");
-  
+
     const normalizedData = {
       ...medicalHistoryFormData
       // Add more conversions if needed
     };
-  
+
     try {
       // First-time submission: POST
       if (submittedMedicalHistoryData === null) {
-        const response = await medicalHistory(normalizedData,patientId); // POST
+        const response = await medicalHistory(normalizedData, patientId); // POST
         console.log("POST Response:", response.message);
-        console.log("Medical History ID:",response.data.medical_history_id)
+        console.log("Medical History ID:", response.data.medical_history_id)
         setMedicalHistoryId(response.data.medical_history_id);
-  
+
         setSubmittedMedicalHistoryData(normalizedData); // Save submitted state
       }
-  
+
       // Data has changed: PUT
       else if (JSON.stringify(normalizedData) !== JSON.stringify(submittedMedicalHistoryData)) {
         console.log("PUT Data:", normalizedData);
         const response = await medicalHistoryPut(normalizedData, medicalHistoryId);
 
         console.log("PUT Response:", response.message);
-  
+
         setSubmittedMedicalHistoryData(normalizedData); // Save updated state
       }
-  
+
       // No change: Skip API
       else {
         console.log("No changes in medical history — skipping API call.");
@@ -441,7 +503,7 @@ const AddPatient = () => {
     const body = {
       owner_ids: []
     };
-  
+
     try {
       const response = await axios.post(
         "http://127.0.0.1:9380/v1/kb/list?page=1&page_size=30&keywords=",
@@ -452,7 +514,7 @@ const AddPatient = () => {
           }
         }
       );
-      
+
       const kbId = response.data.data.kbs[0]?.id;
       console.log("Fetched kbId:", kbId);
       setKbs(kbId); // async, won't reflect immediately in next line
@@ -460,39 +522,39 @@ const AddPatient = () => {
       console.error("Failed to fetch Knowledge Base ID:", error);
     }
   };
-  
+
   // To log updated kbs
   useEffect(() => {
     if (kbs) {
       console.log("Updated KbS id:", kbs);
     }
   }, [kbs]);
-  
+
 
   const handleFilesAPi = async () => {
     console.log("Reports array:", reports);
 
-  
+
     const formData = new FormData();
     formData.append("patient_id", patientId);
     formData.append("analysis_status", filesMeta.analysis_status);
     formData.append("source_of_data", filesMeta.source_of_data);
     formData.append("is_abnormal", filesMeta.is_abnormal === "true" || filesMeta.is_abnormal === true);
     formData.append("patient_age_at_record", parseInt(demographicsFormData.age));
-  
+
     // Append multiple files
     reports.forEach((report) => {
       formData.append("patient_analysis_report", report);
     });
     console.log("Form data:", formData);
-  
+
     try {
       const data = await reportss(formData);
       console.log("Response:", data);
     } catch (error) {
       console.error("API Error:", error.response?.data || error.message);
     }
-  }; 
+  };
 
   const finalReportApi = async () => {
     const authorization = localStorage.getItem("authorization");
@@ -503,7 +565,7 @@ const AddPatient = () => {
     console.log("patientId:", patientId);
     console.log("kb_id:", kbs);
     console.log("Authorization:", authorization);
-    
+
     const response = await axios.post(`http://localhost:9380/v1/patient_analysis/patients/${patientId}/generate-final-report`,
       formData,
       {
@@ -514,42 +576,35 @@ const AddPatient = () => {
     console.log(response);
   }
 
-
-
-  // const handleAddPatientAPi = async () => {
-  //   if (reports.length === 0) {
-  //     // No new reports to upload → directly go home
-  //     navigate("/home");
-  //   } else {
-  //     // Reports exist → try uploading
-  //     try {
-  //       await handleFilesAPi();
-  //       await finalReportApi();
-  //     } catch (error) {
-  //       console.error("API error occurred:", error);
-  //       // Optional: show toast/snackbar here
-  //     } finally {
-  //       // Always navigate to home
-  //       navigate("/home");
-  //     }
-  //   }
-  // };
-  
-  
   const handleAddPatientAPi = async () => {
     try {
+      // Show loader
+      setLoader({
+        isVisible: true,
+        variant: "dots",     // or 'spinner', 'dots', 'bars'
+        color: "green",         // or any: green, red, purple etc.
+        size: "md",
+        text: "Uploading files and generating report...",
+        showText: true
+      });
+
+      // Perform API tasks
       await handleFilesAPi();
       await finalReportApi();
+
     } catch (error) {
       console.error("API error occurred:", error);
-      // Optionally show a toast or alert here
+      alert("An error occurred during submission. Please try again.");
     } finally {
-      // Navigate to home no matter what
+      // Hide loader
+      setLoader(prev => ({ ...prev, isVisible: false }));
+
+      // Navigate home regardless of result
       navigate("/home");
     }
   };
 
-    
+
 
   // Demographics & Identity
   const DemographicsStep = () => (
@@ -565,17 +620,23 @@ const AddPatient = () => {
           label={t("last_name")}
           value={demographicsFormData.last_name}
           onChange={(v) => handleDemographicsInputChange("last_name", v)}
-          required
+
         />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <FloatingInput
-          label={t("email")}
-          type="email"
-          value={demographicsFormData.email}
-          onChange={(v) => handleDemographicsInputChange("email", v)}
-          required
-        />
+        <div className={`space-y-1 ${emailError ? 'email-error-container' : ''}`}>
+          <FloatingInput
+            label={t("email")}
+            type="email"
+            value={demographicsFormData.email || ""}
+            onChange={(v) => handleDemographicsInputChange("email", v)}
+            required
+          />
+          {emailError && (
+            <p className="text-sm text-red-600">{emailError}</p>
+          )}
+        </div>
+
         <FloatingInput
           label={t("age")}
           type="number"
@@ -653,7 +714,7 @@ const AddPatient = () => {
           onChange={(v) => handleDemographicsInputChange("status", v)}
           required
         />
-        
+
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <SelectInput
@@ -727,112 +788,131 @@ const AddPatient = () => {
     </div>
   );
 
+  const isFormValid = () => {
+    // Check if email is valid (no error and not empty)
+    const emailValid = !emailError && demographicsFormData.email;
+
+    // Only check the required fields: first_name, last_name, age, and email
+    const requiredFields = [
+      'first_name', 'age', 'email'
+    ];
+
+    const allRequiredFieldsFilled = requiredFields.every(
+      field => demographicsFormData[field]
+    );
+
+    return emailValid && allRequiredFieldsFilled;
+  };
+
   // Anthropometrics & Body Composition
-  const AnthropometricsStep = () => (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <FloatingInput
-          label={t("weight_kg")}
-          type="number"
-          value={anthropometricsFormData.weight_kg}
-          onChange={(v) => handleAnthropometricsInputChange("weight_kg", v)}
-          required
-        />
-        <FloatingInput
-          label={t("height_cm")}
-          type="number"
-          value={anthropometricsFormData.height_cm}
-          onChange={(v) => handleAnthropometricsInputChange("height_cm", v)}
-          required
-        />
-        <FloatingInput
-          label={t("bmi")}
-          type="number"
-          value={anthropometricsFormData.bmi}
-          onChange={(v) => handleAnthropometricsInputChange("bmi", v)}
-          required
-        />
+  const AnthropometricsStep = () => {
+
+    return (
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <FloatingInput
+            label={t("weight_kg")}
+            type="number"
+            value={anthropometricsFormData.weight_kg}
+            onChange={(v) => handleAnthropometricsInputChange("weight_kg", v)}
+            required
+          />
+          <FloatingInput
+            label={t("height_cm")}
+            type="number"
+            value={anthropometricsFormData.height_cm}
+            onChange={(v) => handleAnthropometricsInputChange("height_cm", v)}
+            required
+          />
+          <FloatingInput
+            label={t("bmi")}
+            type="number"
+            value={anthropometricsFormData.bmi}
+            disabled
+            required
+          />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <FloatingInput
+            label={t("waist_circumference_cm")}
+            type="number"
+            value={anthropometricsFormData.waist_circumference_cm}
+            onChange={(v) =>
+              handleAnthropometricsInputChange("waist_circumference_cm", v)
+            }
+            required
+          />
+          <FloatingInput
+            label={t("hip_circumference_cm")}
+            type="number"
+            value={anthropometricsFormData.hip_circumference_cm}
+            onChange={(v) =>
+              handleAnthropometricsInputChange("hip_circumference_cm", v)
+            }
+            required
+          />
+          <FloatingInput
+            label={t("waist_to_hip_ratio")}
+            type="number"
+            value={anthropometricsFormData.waist_to_hip_ratio}
+            onChange={(v) =>
+              handleAnthropometricsInputChange("waist_to_hip_ratio", v)
+            }
+            required
+          />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <FloatingInput
+            label={t("body_fat_percent")}
+            type="number"
+            value={anthropometricsFormData.body_fat_percent}
+            onChange={(v) =>
+              handleAnthropometricsInputChange("body_fat_percent", v)
+            }
+            required
+          />
+          <FloatingInput
+            label={t("muscle_mass_percent")}
+            type="number"
+            value={anthropometricsFormData.muscle_mass_percent}
+            onChange={(v) =>
+              handleAnthropometricsInputChange("muscle_mass_percent", v)
+            }
+            required
+          />
+          <FloatingInput
+            label={t("visceral_fat_level")}
+            type="number"
+            value={anthropometricsFormData.visceral_fat_level}
+            onChange={(v) =>
+              handleAnthropometricsInputChange("visceral_fat_level", v)
+            }
+            required
+          />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <FloatingInput
+            label={t("bone_mass")}
+            type="number"
+            value={anthropometricsFormData.bone_mass}
+            onChange={(v) =>
+              handleAnthropometricsInputChange("bone_mass", v)
+            }
+            required
+          />
+          <FloatingInput
+            label={t("hydration_status")}
+            type="number"
+            value={anthropometricsFormData.hydration_status}
+            onChange={(v) =>
+              handleAnthropometricsInputChange("hydration_status", v)
+            }
+            required
+          />
+        </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <FloatingInput
-          label={t("waist_circumference_cm")}
-          type="number"
-          value={anthropometricsFormData.waist_circumference_cm}
-          onChange={(v) =>
-            handleAnthropometricsInputChange("waist_circumference_cm", v)
-          }
-          required
-        />
-        <FloatingInput
-          label={t("hip_circumference_cm")}
-          type="number"
-          value={anthropometricsFormData.hip_circumference_cm}
-          onChange={(v) =>
-            handleAnthropometricsInputChange("hip_circumference_cm", v)
-          }
-          required
-        />
-        <FloatingInput
-          label={t("waist_to_hip_ratio")}
-          type="number"
-          value={anthropometricsFormData.waist_to_hip_ratio}
-          onChange={(v) =>
-            handleAnthropometricsInputChange("waist_to_hip_ratio", v)
-          }
-          required
-        />
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <FloatingInput
-          label={t("body_fat_percent")}
-          type="number"
-          value={anthropometricsFormData.body_fat_percent}
-          onChange={(v) =>
-            handleAnthropometricsInputChange("body_fat_percent", v)
-          }
-          required
-        />
-        <FloatingInput
-          label={t("muscle_mass_percent")}
-          type="number"
-          value={anthropometricsFormData.muscle_mass_percent}
-          onChange={(v) =>
-            handleAnthropometricsInputChange("muscle_mass_percent", v)
-          }
-          required
-        />
-        <FloatingInput
-          label={t("visceral_fat_level")}
-          type="number"
-          value={anthropometricsFormData.visceral_fat_level}
-          onChange={(v) =>
-            handleAnthropometricsInputChange("visceral_fat_level", v)
-          }
-          required
-        />
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <FloatingInput
-          label={t("bone_mass")}
-          type="number"
-          value={anthropometricsFormData.bone_mass}
-          onChange={(v) =>
-            handleAnthropometricsInputChange("bone_mass", v)
-          }
-          required
-        />
-        <FloatingInput
-          label={t("hydration_status")}
-          type="number"
-          value={anthropometricsFormData.hydration_status}
-          onChange={(v) =>
-            handleAnthropometricsInputChange("hydration_status", v)
-          }
-          required
-        />
-      </div>
-    </div>
-  );
+    );
+  };
 
   // Cardiorespiratory Fitness & Vitals
   const CardioRespiratoryStep = () => (
@@ -897,7 +977,7 @@ const AddPatient = () => {
       </div>
     </div>
   );
-  
+
 
   // Nutrition & Metabolic Health
   const NutritionStep = () => (
@@ -924,7 +1004,7 @@ const AddPatient = () => {
           required
         />
       </div>
-  
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <FloatingInput
           label={t("weekly_processed_foods")}
@@ -947,7 +1027,7 @@ const AddPatient = () => {
           required
         />
       </div>
-  
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <FloatingInput
           label={t("alcohol_intake_weekly")}
@@ -970,7 +1050,7 @@ const AddPatient = () => {
           required
         />
       </div>
-  
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <FloatingInput
           label={t("food_allergies")}
@@ -987,7 +1067,7 @@ const AddPatient = () => {
           required
         />
       </div>
-  
+
       <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
         <SelectInput
           label={t("special_diet")}
@@ -1010,7 +1090,7 @@ const AddPatient = () => {
       </div>
     </div>
   );
-  
+
 
   // Blood Tests & Biomarkers
   const BloodTestsStep = () => (
@@ -1260,7 +1340,7 @@ const AddPatient = () => {
           required
         />
       </div>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <FloatingInput
           label={t("testosterone_free")}
@@ -1417,7 +1497,7 @@ const AddPatient = () => {
           required
         />
       </div>
-  
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <FloatingInput
           label={t("sleep_hours_weekday")}
@@ -1456,7 +1536,7 @@ const AddPatient = () => {
           required
         />
       </div>
-  
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <FloatingInput
           label={t("stress_level")}
@@ -1490,7 +1570,7 @@ const AddPatient = () => {
           required
         />
       </div>
-  
+
       <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
         <SelectInput
           label={t("mental_health_history")}
@@ -1504,7 +1584,7 @@ const AddPatient = () => {
       </div>
     </div>
   );
-  
+
 
   // Exercise & Movement
   const ExerciseStep = () => (
@@ -1523,7 +1603,7 @@ const AddPatient = () => {
           }
           required
         />
-  
+
         {/* Weekly Exercise Type (string from options) */}
         <SelectInput
           label={t("exercise_type")}
@@ -1542,7 +1622,7 @@ const AddPatient = () => {
           required
         />
       </div>
-  
+
       {/* Weekly Exercise Intensity + Steps Per Day */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <SelectInput
@@ -1554,7 +1634,7 @@ const AddPatient = () => {
           }
           required
         />
-  
+
         {/* Steps per Day (integer) */}
         <FloatingInput
           label={t("steps_per_day")}
@@ -1569,7 +1649,7 @@ const AddPatient = () => {
           required
         />
       </div>
-  
+
       {/* Sedentary Hours + Mobility Limitations */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <FloatingInput
@@ -1594,7 +1674,7 @@ const AddPatient = () => {
           required
         />
       </div>
-  
+
       {/* Activity Tracker */}
       <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
         <FloatingInput
@@ -1609,7 +1689,7 @@ const AddPatient = () => {
       </div>
     </div>
   );
-  
+
 
   // Medical History & Risk
   const MedicalHistoryStep = () => (
@@ -1634,7 +1714,7 @@ const AddPatient = () => {
           required
         />
       </div>
-  
+
       <div className="space-y-4">
         <FloatingTextarea
           label={t("supplement_usage")}
@@ -1653,7 +1733,7 @@ const AddPatient = () => {
           required
         />
       </div>
-  
+
       {/* Family History Section */}
       <h3 className="text-lg font-medium text-gray-700 mt-6 mb-3">
         {t("family_history")}
@@ -1687,7 +1767,7 @@ const AddPatient = () => {
           required
         />
       </div>
-  
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <FloatingInput
           label={t("cancer_type")}
@@ -1716,7 +1796,7 @@ const AddPatient = () => {
       </div>
     </div>
   );
-  
+
 
   const handleReportUpload = (e) => {
     const uploadedFiles = Array.from(e.target.files);
@@ -1724,13 +1804,13 @@ const AddPatient = () => {
   };
 
   // Goals & Motivation
-  
+
 
   const MedicalFilesStep = () => {
     return (
       <div className="space-y-6">
         {/* Primary Goal */}
-  
+
         {/* File Upload Section */}
         <div className="mt-6">
           <div className="flex items-center justify-center w-full">
@@ -1754,7 +1834,7 @@ const AddPatient = () => {
               />
             </label>
           </div>
-  
+
           {/* File List */}
           {reports.length > 0 && (
             <div className="mt-4">
@@ -1787,14 +1867,14 @@ const AddPatient = () => {
             </div>
           )}
         </div>
-  
+
         {/* Goals Inputs */}
-        
+
       </div>
     );
   };
-  
-  
+
+
   // === SUBMIT BUTTON ===
   <div className="flex space-x-3">
     <button
@@ -1821,6 +1901,7 @@ const AddPatient = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4">
+      <OverlayLoader {...loader} isVisible={loader.isVisible} />
       <div className="max-w-10xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
@@ -1837,22 +1918,20 @@ const AddPatient = () => {
           <div className="flex justify-center overflow-x-auto py-2">
             <div className="flex items-center space-x-4 md:space-x-4">
               {steps.map((step, index) => (
-              
+
                 <div key={index} className="flex items-center">
                   <div
-                    className={`flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all duration-300 ${
-                      index <= activeStep
-                        ? "bg-blue-600 border-blue-600 text-white"
-                        : "border-gray-300 text-gray-400"
-                    }`}
+                    className={`flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all duration-300 ${index <= activeStep
+                      ? "bg-blue-600 border-blue-600 text-white"
+                      : "border-gray-300 text-gray-400"
+                      }`}
                   >
-                    <step.icon className="h-5 w-5" onClick={() => setActiveStep(index)}/>
+                    <step.icon className="h-5 w-5" onClick={() => setActiveStep(index)} />
                   </div>
                   {index < steps.length - 1 && (
                     <div
-                      className={`w-8 md:w-16 h-0.5 mx-1 md:mx-2 transition-all duration-300 ${
-                        index < activeStep ? "bg-blue-600" : "bg-gray-300"
-                      }`}
+                      className={`w-8 md:w-16 h-0.5 mx-1 md:mx-2 transition-all duration-300 ${index < activeStep ? "bg-blue-600" : "bg-gray-300"
+                        }`}
                     />
                   )}
                 </div>
@@ -1891,11 +1970,10 @@ const AddPatient = () => {
             <button
               onClick={() => setActiveStep(Math.max(0, activeStep - 1))}
               disabled={activeStep === 0}
-              className={`flex items-center px-6 py-3 rounded-xl font-medium transition-all duration-200 ${
-                activeStep === 0
-                  ? "text-gray-400 cursor-not-allowed"
-                  : "text-gray-700 hover:bg-gray-100"
-              }`}
+              className={`flex items-center px-6 py-3 rounded-xl font-medium transition-all duration-200 ${activeStep === 0
+                ? "text-gray-400 cursor-not-allowed"
+                : "text-gray-700 hover:bg-gray-100"
+                }`}
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
               {t("back")}
@@ -1904,31 +1982,36 @@ const AddPatient = () => {
             <div className="flex space-x-3">
               {activeStep < steps.length - 1 ? (
                 <button
+                  disabled={!isFormValid()}
                   onClick={async () => {
                     if (activeStep === 0) {
                       await handleDemographicsApi();
-                    }if(activeStep === 1){
+                    } else if (activeStep === 1) {
                       await handleAnthropometricsApi();
-                    }if(activeStep === 2){
+                    } else if (activeStep === 2) {
                       await handleCardiorespiratoryApi();
-                    }if(activeStep === 3){
+                    } else if (activeStep === 3) {
                       await handleNutritionApi();
-                    }if(activeStep === 4){
+                    } else if (activeStep === 4) {
                       await handleBloodTestsApi();
-                    }if(activeStep === 5){
+                    } else if (activeStep === 5) {
                       await handleMentalHealthApi();
-                    }if(activeStep === 6){
+                    } else if (activeStep === 6) {
                       await handleExerciseApi();
-                    }if(activeStep === 7){
+                    } else if (activeStep === 7) {
                       await handleMedicalHistoryApi();
                     }
                     setActiveStep(Math.min(steps.length - 1, activeStep + 1));
                   }}
-                  className="flex items-center px-8 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors duration-200"
+                  className={`flex items-center px-8 py-3 rounded-xl font-medium transition-colors duration-200 ${!isFormValid()
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-blue-600 text-white hover:bg-blue-700"
+                    }`}
                 >
                   {t("next")}
                   <ArrowLeft className="h-4 w-4 ml-2 rotate-180" />
                 </button>
+
               ) : (
                 <div className="flex space-x-3">
                   <button
@@ -1949,7 +2032,7 @@ const AddPatient = () => {
 
 const FloatingInput = ({
   label,
-  type="text",
+  type = "text",
   value,
   onChange,
   placeholder,
