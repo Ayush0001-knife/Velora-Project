@@ -49,6 +49,7 @@ export const userLogin = async (email, password) => {
 
 export const demographics = async (formData) => {
   const response = await axiosInstance.post(apiUrl.DEMOGRAPHICS, formData);
+  localStorage.setItem("demographicsData", JSON.stringify(response.data));
   return response.data;
 };
 

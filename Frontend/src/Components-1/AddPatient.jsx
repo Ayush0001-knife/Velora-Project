@@ -558,13 +558,11 @@ const AddPatient = () => {
 
   const finalReportApi = async () => {
     const authorization = localStorage.getItem("authorization");
+    const demographicsData = JSON.parse(localStorage.getItem("demographicsData"));
+    console.log(demographicsData.data)
+    const kb_id = demographicsData.data?.kb_id;
     const formData = new FormData();
-    formData.append("kb_id", kbs);
-
-    console.log("Sending final report request with: ");
-    console.log("patientId:", patientId);
-    console.log("kb_id:", kbs);
-    console.log("Authorization:", authorization);
+    formData.append("kb_id",kb_id);
 
     const response = await axios.post(`http://localhost:9380/v1/patient_analysis/patients/${patientId}/generate-final-report`,
       formData,
