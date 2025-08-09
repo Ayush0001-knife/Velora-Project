@@ -44,7 +44,7 @@ const PatientList = ({ data }) => {
   return (
     <div className="w-[80%] h-[70vh] mx-auto bg-white rounded-2xl shadow-lg flex flex-col mt-5">
       {/* Header */}
-      <div className="bg-blue-500 text-white p-6 flex-shrink-0 rounded-t-2xl">
+      <div className="bg-slate-900 text-white p-6 flex-shrink-0 rounded-t-2xl">
         <h1 className="text-2xl font-bold mb-4" onClick={()=>console.log("List ",list)}>{t("patient_records")}</h1>
         <div className="flex items-center justify-between w-full">
           <div className="flex items-center">

@@ -24,12 +24,6 @@ import { anthropometrics, anthropometricsPut, bloodTests, bloodTestsPut, cardior
 const AddPatient = () => {
   const [activeStep, setActiveStep] = useState(0);
 
-  useEffect(() => {
-    if (activeStep === 8) {
-      KnowledgeBaseIDApi();
-    }
-  }, [activeStep]);
-
   const [patientId, setPatientId] = useState(null);
   const [anthropometricsId, setAnthropometricsId] = useState(null);
   const [vitalId, setVitalId] = useState(null);
@@ -207,7 +201,8 @@ const AddPatient = () => {
       if (submittedDemographicsData === null) {
         const response = await demographics(normalizedData);
         console.log("POST Response:", response.message);
-        setPatientId(response.data.id);
+        setPatientId(response.data.patient.id);
+        setKbs(response.data.kb_id);
         setSubmittedDemographicsData(normalizedData);
       } else if (
         JSON.stringify(normalizedData) !==
@@ -498,30 +493,6 @@ const AddPatient = () => {
     }
   };
 
-  const KnowledgeBaseIDApi = async () => {
-    const authorization = localStorage.getItem("authorization");
-    const body = {
-      owner_ids: []
-    };
-
-    try {
-      const response = await axios.post(
-        "http://127.0.0.1:9380/v1/kb/list?page=1&page_size=30&keywords=",
-        body,
-        {
-          headers: {
-            Authorization: `${authorization}`
-          }
-        }
-      );
-
-      const kbId = response.data.data.kbs[0]?.id;
-      console.log("Fetched kbId:", kbId);
-      setKbs(kbId); // async, won't reflect immediately in next line
-    } catch (error) {
-      console.error("Failed to fetch Knowledge Base ID:", error);
-    }
-  };
 
   // To log updated kbs
   useEffect(() => {

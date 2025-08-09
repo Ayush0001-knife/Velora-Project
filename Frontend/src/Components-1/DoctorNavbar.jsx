@@ -20,19 +20,13 @@ const DoctorNavbar = () => {
 
   return (
     <nav className="w-[90%] mx-auto mt-4 h-20 px-5 rounded-3xl flex items-center justify-between bg-slate-900 shadow-2xl border border-slate-700">
-      {/* Logo and Title */}
-      <div className="flex items-center gap-4 cursor-pointer group">
-        <div className="relative">
-          <div className="absolute -inset-1 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full blur opacity-70 group-hover:opacity-100 transition duration-300"></div>
-          <img
-            src="/Logo.png"
-            alt="Velora AI Logo"
-            className="relative h-14 w-14 object-contain rounded-full border-2 border-slate-700"
-          />
-        </div>
-        <span className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-          Velora AI
-        </span>
+      {/* Logo */}
+      <div className="flex items-center">
+        <img
+          src="/velora-final-03.png"
+          alt="Velora Logo"
+          className="h-10 object-contain"
+        />
       </div>
 
       {/* Navigation Pillars */}
