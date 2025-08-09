@@ -6,6 +6,7 @@ import PatientPage from "./Components-1/PatientPage";
 import LoginPage from "./Components-1/LoginPage";
 import AdminInterface from "./Pages/AdminInterface";
 import PatientInterface from "./Pages/PatientInterface";
+import ChatPage from "./Components-1/ChatPage";
 
 const App = () => {
   return (
@@ -15,6 +16,7 @@ const App = () => {
         <Route path="/home" element={<DoctorPage />} />
         <Route path="/add-patient" element={<AddPatient />} />
         <Route path="/patient" element={<PatientPage />} />
+        <Route path="/chat" element={<ChatPage />} />
       </Routes>
 
       {/* <PatientInterface /> */}

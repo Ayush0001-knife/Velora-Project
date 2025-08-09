@@ -1,15 +1,29 @@
 import { useState } from "react";
 import i18n from "i18next";
 import { useTranslation } from "react-i18next";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const DoctorNavbar = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   const pillarKeys = ["patients", "reports", "prevention", "chat"];
-  const [activePillar, setActivePillar] = useState("patients");
+  const location = useLocation();
+  const [activePillar, setActivePillar] = useState(() => {
+    // Set initial active tab based on current route
+    if (location.pathname === '/chat') return 'chat';
+    if (location.pathname === '/home') return 'patients';
+    return 'patients';
+  });
 
   const handlePillarChange = (key) => {
     setActivePillar(key);
+    if (key === 'chat') {
+      navigate('/chat');
+    } else if (key === 'patients') {
+      navigate('/home');
+    }
+    // Add other navigation paths as needed
   };
 
   const handleLanguageChange = (e) => {
@@ -47,12 +61,8 @@ const DoctorNavbar = () => {
         ))}
       </div>
 
-      {/* Action Buttons */}
-      <div className="flex gap-6 items-center">
-        <button className="group flex items-center gap-3 text-slate-300 hover:text-white cursor-pointer rounded-lg px-4 py-2 transition-all hover:bg-slate-800 hover:border-slate-700">
-          <span className="font-medium">{t("history")}</span>
-          <i className="ri-chat-history-line text-2xl group-hover:text-cyan-400 transition-colors"></i>
-        </button>
+      {/* Profile Button */}
+      <div className="flex items-center">
         <button className="group flex items-center gap-3 text-slate-300 hover:text-white cursor-pointer rounded-lg px-4 py-2 transition-all hover:bg-slate-800 hover:border-slate-700">
           <span className="font-medium">{t("profile")}</span>
           <i className="ri-account-circle-line text-2xl group-hover:text-cyan-400 transition-colors"></i>
