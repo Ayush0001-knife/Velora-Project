@@ -46,49 +46,135 @@ const PatientPage = () => {
   const [documents, setDocuments] = useState([]);
 
   useEffect(() => {
+    if (!patient?.id) return;
+
     const fetchKbId = async () => {
-      const kbId = await KnowledgeBaseIDApi();
+      const kbId = await KnowledgeBaseIDApi(patient.id);
+      console.log("KbId fetched and set:", kbId);
       if (kbId) {
         setKbs(kbId);
       }
     };
 
     fetchKbId();
-  }, []);
+  }, [patient?.id]);
+
+
+
+
+  // useEffect(() => {
+  //   if (!analysis || analysis.length === 0 || !patient?.id || !kbs) return;
+
+  //   const authorization = localStorage.getItem("authorization");
+
+  //   const formattedDocs = analysis.flatMap((item) => {
+  //     const date = new Date(item.create_date);
+  //     const docs = [];
+
+  //     if (item.patient_analysis_report) {
+  //       docs.push({
+  //         name: "Patient Analysis Report",
+  //         date,
+  //         url: item.patient_analysis_report,
+  //         type: "Analysis",
+  //       });
+  //     }
+
+  //     if (item.patient_ocr_report) {
+  //       docs.push({
+  //         name: "Patient OCR Report",
+  //         date,
+  //         url: item.patient_ocr_report,
+  //         type: "OCR",
+  //       });
+  //     }
+
+  //     return docs;
+  //   });
+
+  //   const fetchDocuments = async () => {
+  //     try {
+  //       const response = await axios.get(
+  //         `http://127.0.0.1:9380/v1/document/documents/by-patient/${patient.id}?kb_id=${kbs}&page=1&page_size=10&orderby=create_time&desc=true`,
+  //         {
+  //           headers: {
+  //             Authorization: `${authorization}`,
+  //           },
+  //         }
+  //       );
+
+  //       const fetchedDocs = response.data.data.docs || [];
+
+  //       const formattedFetchedDocs = fetchedDocs.map((doc) => ({
+  //         name: "Patient Combined Document",
+  //         date: new Date(doc.create_date),
+  //         url: `http://127.0.0.1:9380/v1/document/download/${doc.id}`,
+  //         type: "Combined",
+  //       }));
+
+  //       const allDocs = [...formattedDocs, ...formattedFetchedDocs].sort(
+  //         (a, b) => new Date(b.date) - new Date(a.date)
+  //       );
+
+  //       setDocuments(allDocs);
+  //     } catch (error) {
+  //       console.error("❌ Error fetching patient combined documents:", error);
+  //       setDocuments(formattedDocs); // fallback
+  //     }
+  //   };
+
+  //   fetchDocuments();
+  // }, [analysis, patient?.id, kbs]);
 
   useEffect(() => {
-    if (!analysis || analysis.length === 0 || !patient?.id || !kbs) return;
+    if (!patient?.id || !kbs) return;
 
     const authorization = localStorage.getItem("authorization");
 
-    const formattedDocs = analysis.flatMap((item) => {
-      const date = new Date(item.create_date);
-      const docs = [];
-
-      if (item.patient_analysis_report) {
-        docs.push({
-          name: "Patient Analysis Report",
-          date,
-          url: item.patient_analysis_report,
-          type: "Analysis",
-        });
-      }
-
-      if (item.patient_ocr_report) {
-        docs.push({
-          name: "Patient OCR Report",
-          date,
-          url: item.patient_ocr_report,
-          type: "OCR",
-        });
-      }
-
-      return docs;
-    });
-
-    const fetchDocuments = async () => {
+    const fetchAnalysisReports = async () => {
       try {
-        const response = await axios.get(
+        // 1️⃣ STEP 1 — Fetch patient analysis reports
+        console.log("📡 Fetching patient analysis reports for:", patient.id);
+        const analysisRes = await axios.get(
+          `http://192.168.1.135:9380/v1/patient_analysis/patient_analysis/${patient.id}`,
+          {
+            headers: {
+              Authorization: `${authorization}`,
+              Accept: "application/json",
+            },
+          }
+        );
+        console.log("✅ [STEP 1] Patient Analysis API Response:", analysisRes.data);
+
+        const analysisData = analysisRes.data.data || [];
+        const formattedAnalysisDocs = analysisData.flatMap((item) => {
+          const date = new Date(item.create_date);
+          const docs = [];
+
+          if (item.patient_analysis_report_url) {
+            docs.push({
+              name: "Patient Analysis Report",
+              date,
+              url: item.patient_analysis_report_url,
+              type: "Analysis",
+            });
+          }
+
+          if (item.patient_ocr_report_url) {
+            docs.push({
+              name: "Patient OCR Report",
+              date,
+              url: item.patient_ocr_report_url,
+              type: "OCR",
+            });
+          }
+
+          return docs;
+        });
+
+        // 2️⃣ STEP 2 — Fetch combined document list
+        console.log("📡 Fetching combined document list from KB for patient:", patient.id);
+        const docsRes = await axios.get(
           `http://127.0.0.1:9380/v1/document/documents/by-patient/${patient.id}?kb_id=${kbs}&page=1&page_size=10&orderby=create_time&desc=true`,
           {
             headers: {
@@ -96,31 +182,66 @@ const PatientPage = () => {
             },
           }
         );
+        console.log("✅ [STEP 2] Document list API Response:", docsRes.data);
 
-        const fetchedDocs = response.data.data.docs || [];
+        const fetchedDocs = docsRes.data.data.docs || [];
 
-        const formattedFetchedDocs = fetchedDocs.map((doc) => ({
+        // Instead of fetching them now, store docId for later click
+        const combinedDocs = fetchedDocs.map((doc) => ({
           name: "Patient Combined Document",
           date: new Date(doc.create_date),
-          url: `http://127.0.0.1:9380/v1/document/download/${doc.id}`,
           type: "Combined",
+          docId: doc.id, // save doc id for later
         }));
 
-        // ✅ Merge and sort by date (newest first)
-        const allDocs = [...formattedDocs, ...formattedFetchedDocs].sort(
+        // Merge all documents
+        const allDocs = [...formattedAnalysisDocs, ...combinedDocs].sort(
           (a, b) => new Date(b.date) - new Date(a.date)
         );
 
         setDocuments(allDocs);
-
+        console.log("📄 Final processed documents list:", allDocs);
       } catch (error) {
-        console.error("❌ Error fetching patient combined documents:", error);
-        setDocuments(formattedDocs); // Fallback to just analysis+OCR
+        console.error("❌ Error in fetching documents pipeline:", error);
       }
     };
 
-    fetchDocuments();
-  }, [analysis, patient?.id, kbs]);
+    fetchAnalysisReports();
+  }, [patient?.id, kbs]);
+
+  // 📂 On-click handler for documents
+  const handleDocumentClick = async (doc) => {
+
+    console.log("doc", doc)
+    try {
+      if (doc.type === "Combined") {
+        console.log(`📡 Fetching combined document on click for doc_id: ${doc.docId}`);
+        const authorization = localStorage.getItem("authorization");
+        const docDetailRes = await axios.get(
+          `http://localhost:9222/v1/document/get/${doc.docId}`,
+          {
+            headers: {
+              Authorization: `${authorization}`,
+            },
+          }
+        );
+        console.log(`✅ [CLICK] Document detail for ${doc.docId}:`, docDetailRes.data);
+
+        const downloadUrl = docDetailRes.data?.data?.url;
+        if (!downloadUrl) {
+          alert("No download URL found for this document.");
+          return;
+        }
+        window.open(downloadUrl, "_blank");
+      } else {
+        // Directly open for Analysis & OCR docs
+        window.open(doc.url, "_blank");
+      }
+    } catch (err) {
+      console.error("❌ Failed to open or download document", err);
+      alert("Failed to open document.");
+    }
+  };
 
 
 
@@ -158,7 +279,7 @@ const PatientPage = () => {
     }
   }, [moreDetails]);
 
-  const KnowledgeBaseIDApi = async () => {
+  const KnowledgeBaseIDApi = async (patientId) => {
     const authorization = localStorage.getItem("authorization");
     const body = { owner_ids: [] };
 
@@ -169,15 +290,27 @@ const PatientPage = () => {
         { headers: { Authorization: `${authorization}` } }
       );
 
-      const kbId = response.data.data.kbs[0]?.id;
-      console.log("Fetched kbId:", kbId);
-      setKbs(kbId); // still optional, if you want to show it elsewhere
-      return kbId;  // return directly
+      const allKbs = response.data.data.kbs;
+
+      const matchedKb = allKbs.find((kb) =>
+        kb.name.endsWith(patientId)
+      );
+
+      if (matchedKb) {
+        const kbId = matchedKb.id;
+        console.log("✅ Found KB ID for patient:", kbId);
+        return kbId;
+      } else {
+        console.warn("⚠️ No matching KB found for patient:", patientId);
+        return null;
+      }
     } catch (error) {
-      console.error("Failed to fetch Knowledge Base ID:", error);
+      console.error("❌ Failed to fetch Knowledge Base ID:", error);
       return null;
     }
   };
+
+
 
   const finalReportApi = async (kbId) => {
     const authorization = localStorage.getItem("authorization");
@@ -221,6 +354,9 @@ const PatientPage = () => {
       const formData = new FormData();
       formData.append("kb_id", kbs);
       formData.append("is_report", true);
+
+      console.log("🚀 Sending kb_id:", kbs);
+
 
       const response = await axios.post(
         `http://127.0.0.1:9380/v1/report/reports/${patientId}/generate-final-report`,
@@ -383,95 +519,62 @@ const PatientPage = () => {
             {documents.length === 0 ? (
               <p className="text-sm text-gray-500">No documents available.</p>
             ) : (
-              <>
-                {documents.map((doc, index) => (
-                  <div
-                    key={index}
-                    className="block cursor-pointer"
-                    onClick={() => {
-                      try {
-                        // Open in new tab
-                        const newTab = window.open("", "_blank");
-
-                        // Fetch the file as blob
-                        fetch(doc.url)
-                          .then((res) => res.blob())
-                          .then((blob) => {
-                            const blobUrl = URL.createObjectURL(blob);
-
-                            // Redirect new tab to blob
-                            if (newTab) {
-                              newTab.location.href = blobUrl;
-                            }
-
-                            // Trigger download
-                            const link = document.createElement("a");
-                            link.href = blobUrl;
-                            link.download = `${doc.name}.pdf`;
-                            document.body.appendChild(link);
-                            link.click();
-                            link.remove();
-                          });
-                      } catch (err) {
-                        console.error("Failed to open or download document", err);
-                      }
-                    }}
-                  >
-                    <div className="flex items-center justify-between bg-white p-3 rounded-lg hover:bg-gray-50 transition-all duration-200 border border-gray-100 shadow-sm hover:shadow-md mb-2">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 bg-blue-100 rounded-lg">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-4 w-4 text-blue-600"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                            />
-                          </svg>
-                        </div>
-                        <div>
-                          <h3 className="font-medium text-sm text-gray-800">{doc.name}</h3>
-                          <p className="text-xs text-gray-500 mt-0.5">
-                            {new Date(doc.date).toLocaleString("en-GB", {
-                              day: "2-digit",
-                              month: "short",
-                              year: "numeric",
-                              hour: "2-digit",
-                              minute: "2-digit",
-                              hour12: true,
-                            })}
-                          </p>
-                        </div>
-                      </div>
-                      <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+              documents.map((doc, index) => (
+                <div
+                  key={index}
+                  className="block cursor-pointer"
+                  onClick={() => handleDocumentClick(doc)}
+                >
+                  <div className="flex items-center justify-between bg-white p-3 rounded-lg hover:bg-gray-50 transition-all duration-200 border border-gray-100 shadow-sm hover:shadow-md mb-2">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-blue-100 rounded-lg">
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
-                          className="h-4 w-4 text-gray-600"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
+                          className="h-4 w-4 text-blue-600"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
                         >
-                          <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                          />
                         </svg>
-                      </button>
+                      </div>
+                      <div>
+                        <h3 className="font-medium text-sm text-gray-800">{doc.name}</h3>
+                        <p className="text-xs text-gray-500 mt-0.5">
+                          {new Date(doc.date).toLocaleString("en-GB", {
+                            day: "2-digit",
+                            month: "short",
+                            year: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            hour12: true,
+                          })}
+                        </p>
+                      </div>
                     </div>
+                    <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-4 w-4 text-gray-600"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
+                      </svg>
+                    </button>
                   </div>
-                ))}
-              </>
+                </div>
+              ))
             )}
-
-
-
-
-
           </div>
         </div>
       </div>
+
 
       <div className="col-start-2 col-end-4 row-start-1 row-end-4 bg-white p-3 border border-gray-200 rounded-[0.75rem] shadow-lg m-2 mt-4">
         <h2 className="text-base font-semibold mb-3">
