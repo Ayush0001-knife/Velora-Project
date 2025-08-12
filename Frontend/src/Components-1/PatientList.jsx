@@ -4,7 +4,7 @@ import { FiSearch } from "react-icons/fi";
 import { useTranslation } from "react-i18next";
 import { patientAllData } from "../services/api";
 
-const PatientList = ({ data }) => {
+const PatientList = ({ data, onPatientSelect, selectedPatient }) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
@@ -26,9 +26,14 @@ const PatientList = ({ data }) => {
 
 
   const handleClick = async (item) => {
-    const response = await patientAllData(item.id);
-    const data = response.data;
-    navigate("/patient", { state: data });
+    if (onPatientSelect) {
+      onPatientSelect(item);
+    } else {
+      // Fallback to original behavior if not used in ChatPage
+      const response = await patientAllData(item.id);
+      const data = response.data;
+      navigate("/patient", { state: data });
+    }
   };
 
   const handleSort = (key) => {
@@ -116,11 +121,11 @@ const PatientList = ({ data }) => {
             <div
               key={index}
               onClick={() => handleClick(item)}
-              className="flex py-4 border-b border-gray-200 hover:bg-gray-50 cursor-pointer"
+              className={`flex items-center p-4 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer ${
+                selectedPatient?.id === item.id ? 'bg-blue-50 border-l-4 border-blue-500' : ''
+              }`}
             >
-              <div className="w-[20%] px-4 font-medium">
-                {item.first_name} {item.last_name}
-              </div>
+              <div className="w-[20%] px-4 font-medium">{item.first_name} {item.last_name}</div>
               <div className="w-[15%] px-4 text-center">{item.gender}</div>
               <div className="w-[15%] px-4 text-center">{item.age}</div>
               <div className="w-[15%] px-4 text-center">{bmi}</div>
