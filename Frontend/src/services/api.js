@@ -35,6 +35,7 @@ export const userLogin = async (email, password) => {
       return {
         token,
         user: userInfo,
+        isSuperUser: data.data.is_superuser,
       };
     } else {
       console.warn("No access token found in response");
@@ -163,6 +164,15 @@ export const GENERATEFINALREPORT = async (patientId,formData) => {
   return response.data;
 }
 
+export const RECIPIEUPLOAD = async (formData) => {
+  const response = await axiosInstance.post(apiUrl.RECIPIEUPLOAD,formData);
+  return response.data;
+}
+
+export const GETRECIPIES = async () => {
+  const response = await axiosInstance.get(apiUrl.GETRECIPIES);
+  return response.data;
+}
 
 
 

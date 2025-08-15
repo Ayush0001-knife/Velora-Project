@@ -18,47 +18,62 @@ import {
   X,
   Calendar,
   FolderGit,
+  Upload,
 } from "lucide-react";
 import ReportGenerationTab from "../Components2/code/ReportGeneration";
 import Dashboard from "../Components2/code/Dashboard";
 import ChatManagement from "../Components2/code/ChatManagement";
 import { useTranslation } from "react-i18next";
+import { GETRECIPIES, RECIPIEUPLOAD } from "../services/api";
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("dashboard");
-  const [recipes, setRecipes] = useState([
-    {
-      id: 1,
-      title: "Chicken Parmesan",
-      created: "2024-01-15",
-    },
-    {
-      id: 2,
-      title: "Chocolate Cake",
-      created: "2024-01-20",
-    },
-    {
-      id: 3,
-      title: "Caesar Salad",
-      created: "2024-01-25",
-    },
-  ]);
+  const [recipes, setRecipes] = useState([]);
+
+  const [selectedRecipe, setSelectedRecipe] = useState(null);
 
   const { t } = useTranslation();
 
-  const [selectedRecipe, setSelectedRecipe] = useState(null);
+
+
   const [showRecipeModal, setShowRecipeModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
 
-  const filteredRecipes = recipes.filter((recipe) => {
-    const matchesSearch = recipe.title
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
-    const matchesFilter =
-      filterStatus === "all" || recipe.status === filterStatus;
-    return matchesSearch && matchesFilter;
-  });
+
+
+  useEffect(() => {
+    const fetchRecipes = async () => {
+      try {
+        const response = await GETRECIPIES();
+        console.log("API Recipes:", response);
+  
+        if (Array.isArray(response)) {
+          // API returned array directly
+          setRecipes(response);
+        } else if (Array.isArray(response?.data)) {
+          // API returned { data: [...] }
+          setRecipes(response.data);
+        } else {
+          console.warn("Unexpected API structure:", response);
+        }
+      } catch (error) {
+        console.error("Error fetching recipes:", error);
+      }
+    };
+  
+    // Immediately invoke the async function
+    fetchRecipes();
+  }, []);
+  
+  useEffect(() => {
+    console.log("Recipes state updated:", recipes);
+  }, [recipes]);
+  
+
+
+
+
 
   const handleRecipeAction = (action, recipe = null) => {
     if (action === "add" || action === "edit") {
@@ -69,33 +84,42 @@ export default function AdminDashboard() {
     }
   };
 
-  const saveRecipe = (recipeData) => {
-    if (selectedRecipe) {
-      setRecipes(
-        recipes.map((r) =>
-          r.id === selectedRecipe.id ? { ...r, ...recipeData } : r
-        )
-      );
-    } else {
-      setRecipes([
-        ...recipes,
-        {
-          ...recipeData,
-          id: Date.now(),
-          created: new Date().toISOString().split("T")[0],
-        },
-      ]);
-    }
-    setShowRecipeModal(false);
-    setSelectedRecipe(null);
-  };
+  const [selectedRecipeFile, setSelectedRecipeFile] = useState(null);
 
+  const handleRecipeFileChange = (e) => {
+    const file = e.target.files[0];
+    setSelectedRecipeFile(file);
+  };
+  
+  const removeFile = () => {
+    setSelectedRecipeFile(null);
+    const fileInput = document.getElementById("file-upload");
+    if (fileInput) {
+      fileInput.value = "";
+    }
+  };
+  
+  const saveRecipe = async () => {
+    if (!selectedRecipeFile) return;
+  
+    const formData = new FormData();
+    formData.append("file", selectedRecipeFile); // ✅ Correct field name
+  
+    try {
+      const response = await RECIPIEUPLOAD(formData);
+      console.log("Response:", response);
+    } catch (error) {
+      console.error("Upload error:", error);
+    }
+  };
+  
+  
   const RecipeModal = () => (
     <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
       <div className="bg-white rounded-2xl p-8 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-            {selectedRecipe ? "Edit Recipe" : "Add New Recipe"}
+            Add New Recipe
           </h2>
           <button
             onClick={() => setShowRecipeModal(false)}
@@ -104,78 +128,54 @@ export default function AdminDashboard() {
             <X size={20} />
           </button>
         </div>
-
+  
         <div className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Recipe Title
-              </label>
-              <input
-                type="text"
-                defaultValue={selectedRecipe?.title || ""}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                placeholder="Enter recipe title"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Category
-              </label>
-              <select
-                defaultValue={selectedRecipe?.category || ""}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              >
-                <option value="">Select category</option>
-                <option value="Appetizer">Appetizer</option>
-                <option value="Main Course">Main Course</option>
-                <option value="Dessert">Dessert</option>
-                <option value="Beverage">Beverage</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Difficulty
-              </label>
-              <select
-                defaultValue={selectedRecipe?.difficulty || ""}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              >
-                <option value="">Select difficulty</option>
-                <option value="Easy">Easy</option>
-                <option value="Medium">Medium</option>
-                <option value="Hard">Hard</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Status
-              </label>
-              <select
-                defaultValue={selectedRecipe?.status || "draft"}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              >
-                <option value="draft">Draft</option>
-                <option value="published">Published</option>
-              </select>
-            </div>
-          </div>
-
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Description
+              Upload Document
             </label>
-            <textarea
-              rows={4}
-              defaultValue={selectedRecipe?.description || ""}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              placeholder="Enter recipe description"
-            />
+            <div className="w-full">
+              <input
+                id="file-upload"
+                type="file"
+                accept=".pdf,.doc,.docx,.txt,.rtf,.csv"
+                onChange={handleRecipeFileChange}
+                className="hidden"
+              />
+              <label
+                htmlFor="file-upload"
+                className="flex flex-col items-center justify-center w-full px-4 py-6 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 hover:border-purple-400 transition-colors"
+              >
+                <Upload className="w-8 h-8 text-gray-400 mb-2" />
+                <span className="text-sm text-gray-600">
+                  Click to upload document or drag and drop
+                </span>
+                <span className="text-xs text-gray-400 mt-1">
+                  PDF, DOC, DOCX, TXT, RTF up to 10MB
+                </span>
+              </label>
+  
+              {selectedRecipeFile && (
+                <div className="mt-3 p-3 bg-gray-50 rounded-lg flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Upload className="w-4 h-4 text-green-500" />
+                    <span className="text-sm text-gray-700">{selectedRecipeFile.name}</span>
+                    <span className="text-xs text-gray-400">
+                      ({Math.round(selectedRecipeFile.size / 1024)} KB)
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={removeFile}
+                    className="p-1 hover:bg-gray-200 rounded-full transition-colors"
+                  >
+                    <X size={14} className="text-gray-500" />
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
-
+  
           <div className="flex justify-end space-x-4">
             <button
               type="button"
@@ -186,19 +186,18 @@ export default function AdminDashboard() {
             </button>
             <button
               type="button"
-              onClick={() =>
-                saveRecipe({ title: "New Recipe", status: "draft" })
-              }
+              onClick={saveRecipe}
               className="px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all duration-300 transform hover:scale-105"
             >
               <Save size={16} className="inline mr-2" />
-              Save Recipe
+              Save Document
             </button>
           </div>
         </div>
       </div>
     </div>
   );
+  
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100">
@@ -310,7 +309,7 @@ export default function AdminDashboard() {
 
             {/* Recipes Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredRecipes.map((recipe) => (
+              {recipes.map((recipe) => (
                 <div
                   key={recipe.id}
                   className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:scale-105"
@@ -321,13 +320,13 @@ export default function AdminDashboard() {
                   <div className="p-6">
                     <div className="flex justify-between items-start mb-4">
                       <h3 className="text-xl font-bold text-gray-900">
-                        {recipe.title}
+                        {recipe.name}
                       </h3>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-gray-500">
                         <Calendar size={14} className="inline mr-1" />
-                        {recipe.created}
+                        {recipe.instructions}
                       </span>
                       <div className="flex space-x-2">
                         <button
@@ -349,12 +348,12 @@ export default function AdminDashboard() {
               ))}
             </div>
 
-            {filteredRecipes.length === 0 && (
+            {/* {filteredRecipes.length === 0 && (
               <div className="text-center py-12">
                 <BookOpen size={48} className="mx-auto text-gray-400 mb-4" />
                 <p className="text-gray-600">{t("no_recipes_found")}</p>
               </div>
-            )}
+            )} */}
           </div>
         )}
 

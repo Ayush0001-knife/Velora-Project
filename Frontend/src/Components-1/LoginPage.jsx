@@ -51,19 +51,30 @@ export default function LoginPage() {
     console.log("Encrypted:", encryptedPassword, "Email:", email);
   
     try {
-      const data = await userLogin(email, encryptedPassword);
+      const response = await userLogin(email, encryptedPassword);
+
+      const isSuperUser = response?.isSuperUser;
   
-      // ✅ Navigate and notify on success
+      // ✅ Correct path to is_superuser
+      // const isSuper = response?.data?.data?.is_superuser;
+      // const isSuperUser =
+      //   isSuper === true || isSuper === "true" || isSuper === 1 || isSuper === "1";
+
+      //   console.log("isSuperUser", isSuperUser);
+  
       setMessage("Login Successful");
       setBgColor("#088F8F");
       setDuration(3000);
       setShowNotification(true);
   
       setTimeout(() => {
-        navigate("/home");
+        if (isSuperUser) {
+          navigate("/admin");
+        } else {
+          navigate("/home");
+        }
       }, 3000);
     } catch (error) {
-      // ✅ More robust error message handling
       let errorMsg = "Login failed. Try again.";
       if (error?.response?.data?.message) {
         errorMsg = error.response.data.message;
@@ -79,6 +90,8 @@ export default function LoginPage() {
       setShowNotification(true);
     }
   };
+  
+  
  
 
   return (

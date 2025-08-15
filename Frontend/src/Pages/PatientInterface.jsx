@@ -4,7 +4,7 @@ const PatientInterface = () => {
   const [showUpload, setShowUpload] = useState(false);
   const buttons = [
     { label: "View Your Reports 📄", href: "/reports" },
-    { label: "View Personal Data 👤", href: "/personal-data" },
+    { label: "Update Personal Data 👤", href: "/update-data" },
     { label: "Contact Support 📞", href: "/support" },
   ];
 
